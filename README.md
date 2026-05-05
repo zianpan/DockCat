@@ -4,6 +4,19 @@ DockCat 是一只住在 macOS 程序坞里的桌面陪伴小猫。
 
 它会在程序坞边休息、伸懒腰、走来走去，也会温柔地提醒你喝水、起身走走。它不追求过多互动或打扰，只想在屏幕上安静地陪你工作、学习。你可以摸摸小猫让它改变姿势，或者用鼠标把它抱到想要的位置。当你需要专注时，可以让小猫出门玩一会儿，它也许会带回来惊喜。
 
+<table>
+  <tr>
+    <td align="center"><img src="README_figs/rest.png" alt="休息" width="260"></td>
+    <td align="center"><img src="README_figs/walk.png" alt="散步" width="260"></td>
+    <td align="center"><img src="README_figs/water_reminder.png" alt="喝水提醒" width="260"></td>
+  </tr>
+  <tr>
+    <td align="center">休息</td>
+    <td align="center">散步</td>
+    <td align="center">喝水提醒</td>
+  </tr>
+</table>
+
 当前版本面向 macOS 15 及以上系统版本，支持 Intel Mac 和 Apple Silicon Mac。
 
 ## 快速使用
