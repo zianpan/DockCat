@@ -10,7 +10,7 @@ DockCat 是一只住在 macOS 程序坞里的桌面陪伴小猫。
 
 如果你想让小猫来桌面上快速住下，推荐下载 GitHub Releases 中的 `DockCat.zip`。
 
-1. 打开本仓库的 Releases 页面。
+1. 打开本仓库的 [Releases](https://github.com/Auwuua/DockCat/releases) 页面。
 2. 下载最新版本的 `DockCat.zip`。
 3. 解压后，把 `DockCat.app` 拖到“应用程序”文件夹，或放在你喜欢的位置。
 4. 第一次启动时，建议右键点击 `DockCat.app`，选择“打开”，再确认打开。
