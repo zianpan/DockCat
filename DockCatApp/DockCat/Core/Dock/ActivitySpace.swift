@@ -17,7 +17,7 @@ struct ActivitySpace: Equatable {
     var baselineY: CGFloat
     var entrancePoint: CGPoint
 
-    static func make(screenFrame: CGRect, visibleFrame: CGRect, fallbackX: CGFloat? = nil) -> ActivitySpace {
+    static func make(screenFrame: CGRect, visibleFrame: CGRect, startPositionPercent: CGFloat = 75) -> ActivitySpace {
         let edge = inferredDockEdge(screenFrame: screenFrame, visibleFrame: visibleFrame)
         let dockHeight = max(0, visibleFrame.minY - screenFrame.minY)
 
@@ -32,7 +32,8 @@ struct ActivitySpace: Equatable {
             walkRange = screenFrame.minX ... screenFrame.maxX
         }
 
-        let projectedX = fallbackX ?? screenFrame.maxX - screenFrame.width / 5
+        let normalizedPercent = GeometryUtils.clamped(startPositionPercent, to: 0 ... 100) / 100
+        let projectedX = screenFrame.minX + screenFrame.width * normalizedPercent
 
         let clampedX = GeometryUtils.clamped(projectedX, to: walkRange)
         return ActivitySpace(

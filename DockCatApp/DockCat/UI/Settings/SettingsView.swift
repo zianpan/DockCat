@@ -32,16 +32,16 @@ struct SettingsView: View {
         VStack(spacing: 0) {
             TabView {
                 petTab
-                    .tabItem { Text("宠物") }
+                    .tabItem { Text("猫咪设置") }
 
                 parametersTab
-                    .tabItem { Text("参数") }
+                    .tabItem { Text("参数设置") }
 
                 collectablesTab
                     .tabItem { Text("收藏品箱") }
 
                 aboutTab
-                    .tabItem { Text("关于/支持") }
+                    .tabItem { Text("关于") }
             }
             .padding(.horizontal, 18)
             .padding(.top, 14)
@@ -67,10 +67,11 @@ struct SettingsView: View {
                 .frame(maxWidth: .infinity)
 
             VStack(alignment: .leading, spacing: 12) {
-                compactTextField("宠物名字", text: $draft.catName)
+                compactTextField("猫咪名字", text: $draft.catName)
                 compactTextField("对你的称呼", text: $draft.userSalutation)
                 compactTextField("资源包 ID", text: $draft.selectedAssetPackID)
                 compactStepper("缩放", value: scaleBinding, range: 1...100, step: 1, suffix: "%")
+                compactStepper("起始出现位置", value: startPositionBinding, range: 0...100, step: 1, suffix: "%")
             }
             .frame(width: labelWidth + controlWidth, alignment: .center)
         }
@@ -137,7 +138,7 @@ struct SettingsView: View {
                 .font(.system(size: 14, weight: .semibold))
 
             VStack(spacing: 6) {
-                Text("DockCat 是免费下载且开源的软件。")
+                Text("DockCat 是免费下载且开源的软件。作者：Auwuua")
                 HStack(spacing: 0) {
                     Text("项目地址：")
                     Link("https://github.com/Auwuua/DockCat", destination: projectURL)
@@ -156,7 +157,7 @@ struct SettingsView: View {
     }
 
     private var appVersion: String {
-        Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "0.2"
+        Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "0.3"
     }
 
     private var projectURL: URL {
@@ -378,6 +379,13 @@ struct SettingsView: View {
         )
     }
 
+    private var startPositionBinding: Binding<Double> {
+        Binding(
+            get: { draft.startPositionPercent },
+            set: { draft.startPositionPercent = max(0, min(100, $0)) }
+        )
+    }
+
     private func minutesBinding(_ keyPath: WritableKeyPath<AppSettings, TimeInterval>) -> Binding<Double> {
         Binding(
             get: { draft[keyPath: keyPath] / 60 },
@@ -399,6 +407,7 @@ struct SettingsView: View {
         }
         normalized.walkBaseSpeed = max(1, normalized.walkBaseSpeed)
         normalized.catScalePercent = max(1, min(100, normalized.catScalePercent))
+        normalized.startPositionPercent = max(0, min(100, normalized.startPositionPercent))
         return normalized
     }
 }

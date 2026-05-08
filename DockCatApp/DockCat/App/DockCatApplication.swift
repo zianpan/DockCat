@@ -17,7 +17,7 @@ final class DockCatApplication: NSObject, NSApplicationDelegate {
     private let walkAnimator = SpriteAnimator()
 
     private var settings: AppSettings = .defaults
-    private var activitySpace = DockGeometry.currentMainDisplaySpace()
+    private var activitySpace = DockGeometry.currentMainDisplaySpace(startPositionPercent: AppSettings.defaults.startPositionPercent)
     private var outingCatalog: OutingCatalog = .empty
     private var collectableInventory: CollectableInventory = .empty
     private var defaultAssetPack: CatAssetPack!
@@ -37,10 +37,12 @@ final class DockCatApplication: NSObject, NSApplicationDelegate {
     private var walkDirection: CGFloat = 1
     private var pendingOutingDuration: TimeInterval?
     private var pendingOutingReturnReward: OutingReward?
+    private var shouldUseStartPositionForNextTransition = false
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         RuntimeDiagnostics.record("applicationDidFinishLaunching")
         settings = settingsStore.load()
+        activitySpace = DockGeometry.currentMainDisplaySpace(startPositionPercent: settings.startPositionPercent)
         outingCatalog = outingCatalogLoader.loadCatalog()
         collectableInventory = collectableInventoryStore.load()
         configureUsageSessionTracker()
@@ -103,10 +105,10 @@ final class DockCatApplication: NSObject, NSApplicationDelegate {
 
     private func configureStateMachine() {
         stateMachine = CatStateMachine(
-            initialPosition: activitySpace.entrancePoint,
+            initialPosition: startPositionAnchor(),
             entranceProvider: { [weak self] in
                 guard let self else { return .zero }
-                return self.activitySpace.entrancePoint
+                return self.startPositionAnchor()
             },
             walkingDurationRange: durationRange(
                 minimum: settings.walkDurationMinimum,
@@ -199,6 +201,7 @@ final class DockCatApplication: NSObject, NSApplicationDelegate {
         settingsWindowController.onSave = { [weak self] updated in
             guard let self else { return }
             let previousAssetPackID = self.settings.selectedAssetPackID
+            let previousStartPositionPercent = self.settings.startPositionPercent
             self.settings = updated
             self.reminderScheduler.updateSettings(updated)
             if updated.selectedAssetPackID != previousAssetPackID {
@@ -206,9 +209,11 @@ final class DockCatApplication: NSObject, NSApplicationDelegate {
                 self.applyState(self.stateMachine.state)
             }
             self.catWindow.setImageScale(percent: updated.catScalePercent)
-            let clamped = self.clampedCatPoint(self.stateMachine.position)
-            self.stateMachine.updateVisiblePosition(clamped)
-            self.catWindow.setAnchor(clamped)
+            self.activitySpace = DockGeometry.currentMainDisplaySpace(startPositionPercent: updated.startPositionPercent)
+            let point = updated.startPositionPercent == previousStartPositionPercent
+                ? self.clampedCatPoint(self.stateMachine.position)
+                : self.startPositionAnchor()
+            self.updateCurrentPositionPreservingState(point)
             self.updateStateMachineParameters()
         }
     }
@@ -292,7 +297,7 @@ final class DockCatApplication: NSObject, NSApplicationDelegate {
     private func configureDockObserver() {
         dockObserver.onChange = { [weak self] in
             guard let self else { return }
-            self.activitySpace = DockGeometry.currentMainDisplaySpace()
+            self.activitySpace = DockGeometry.currentMainDisplaySpace(startPositionPercent: self.settings.startPositionPercent)
             let clamped = self.clampedCatPoint(self.stateMachine.position)
             self.stateMachine.updateVisiblePosition(clamped)
             self.catWindow.setAnchor(clamped)
@@ -307,7 +312,13 @@ final class DockCatApplication: NSObject, NSApplicationDelegate {
             iconController.showEmptyIcon()
             let pose = renderer.randomPose(for: .transition, fallback: .dialogue)
             catWindow.setImage(pose.image, mirrored: pose.mirrored)
-            let point = clampedCatPoint(stateMachine.position)
+            let point: CGPoint
+            if shouldUseStartPositionForNextTransition {
+                point = startPositionAnchor()
+                shouldUseStartPositionForNextTransition = false
+            } else {
+                point = clampedCatPoint(stateMachine.position)
+            }
             stateMachine.updateVisiblePosition(point)
             catWindow.show(at: point)
         case .walking:
@@ -543,7 +554,9 @@ final class DockCatApplication: NSObject, NSApplicationDelegate {
         startupTimer?.invalidate()
         startupTimer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: false) { [weak self] _ in
             Task { @MainActor in
-                self?.stateMachine.start()
+                guard let self else { return }
+                self.shouldUseStartPositionForNextTransition = true
+                self.stateMachine.start()
             }
         }
     }
@@ -738,15 +751,30 @@ final class DockCatApplication: NSObject, NSApplicationDelegate {
     }
 
     private func outingReturnTarget() -> CGPoint {
-        rightSideActivityTarget()
+        startPositionAnchor()
     }
 
-    private func rightSideActivityTarget() -> CGPoint {
-        let targetCenterX = activitySpace.screenFrame.maxX - activitySpace.screenFrame.width / 5
+    private func startPositionAnchor() -> CGPoint {
+        anchorPoint(forCenterX: activitySpace.entrancePoint.x)
+    }
+
+    private func anchorPoint(forCenterX centerX: CGFloat) -> CGPoint {
         return clampedCatPoint(CGPoint(
-            x: targetCenterX - catWindow.catFrameSize.width / 2,
+            x: centerX - catWindow.catFrameSize.width / 2,
             y: activitySpace.baselineY
         ))
+    }
+
+    private func updateCurrentPositionPreservingState(_ point: CGPoint) {
+        switch stateMachine.state {
+        case .outing(.away):
+            return
+        case .outing(.leaving), .outing(.returning):
+            stateMachine.updateOutingWalkPosition(point)
+        default:
+            stateMachine.updateVisiblePosition(point)
+        }
+        catWindow.setAnchor(point)
     }
 
     private func showRecallConfirmation() {

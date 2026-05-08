@@ -138,5 +138,75 @@
     "chinese_description": "我听见电梯叮的一声，等了一会儿，没有人出来，可能是电梯自己到站了。",
     "english_description": "I heard an elevator ding. I waited, but nobody came out. Maybe the elevator arrived for itself.",
     "author": "Auwuua"
+  },
+  {
+    "id": "small_adventure_box_check",
+    "event_type": "small_adventure",
+    "chinese_description": "我检查了一个空纸盒，里面没有宝物，但是回声听起来很像另一个我在说话。",
+    "english_description": "I checked an empty cardboard box. There was no treasure inside, but the echo sounded like another me talking.",
+    "author": "Auwuua"
+  },
+  {
+    "id": "small_adventure_shadow_pounce",
+    "event_type": "small_adventure",
+    "chinese_description": "我扑了一下自己的影子，它躲得很快。我觉得它可能也练习过。",
+    "english_description": "I pounced at my own shadow. It dodged very quickly. I think it may have practiced too.",
+    "author": "Auwuua"
+  },
+  {
+    "id": "small_adventure_leaf_chase",
+    "event_type": "small_adventure",
+    "chinese_description": "我追了一片跑得很快的叶子，追到一半它突然停下，我也只好装作刚好路过。",
+    "english_description": "I chased a very fast leaf. Halfway through, it suddenly stopped, so I pretended I was just passing by.",
+    "author": "Auwuua"
+  },
+  {
+    "id": "small_adventure_step_count",
+    "event_type": "small_adventure",
+    "chinese_description": "我认真数了几级台阶，数到后来觉得每一级台阶长得都差不多。",
+    "english_description": "I carefully counted some steps. After a while, I decided every step looked almost the same.",
+    "author": "Auwuua"
+  },
+  {
+    "id": "small_adventure_gate_gap",
+    "event_type": "small_adventure",
+    "chinese_description": "我研究了一下门缝有多宽，胡须说可以过去，但是我的心情说先不要。",
+    "english_description": "I studied how wide a gate gap was. My whiskers said I could fit, but my mood said not yet.",
+    "author": "Auwuua"
+  },
+  {
+    "id": "small_adventure_bench_patrol",
+    "event_type": "small_adventure",
+    "chinese_description": "我巡逻了一张长椅，确认它今天也在好好当一张长椅。",
+    "english_description": "I patrolled a bench and confirmed it was doing a good job being a bench today.",
+    "author": "Auwuua"
+  },
+  {
+    "id": "small_adventure_tiny_hill",
+    "event_type": "small_adventure",
+    "chinese_description": "我爬上一个很小的坡，站在上面看了一会儿，感觉自己稍微伟大了一点。",
+    "english_description": "I climbed a very small slope and stood there for a while. I felt a little bit grand.",
+    "author": "Auwuua"
+  },
+  {
+    "id": "small_adventure_sign_sniff",
+    "event_type": "small_adventure",
+    "chinese_description": "我闻了闻路边的牌子，上面写了什么我看不懂，但它闻起来很正式。",
+    "english_description": "I sniffed a sign by the road. I could not read what it said, but it smelled very official.",
+    "author": "Auwuua"
+  },
+  {
+    "id": "small_adventure_roundabout",
+    "event_type": "small_adventure",
+    "chinese_description": "我绕着一个花盆走了一圈，走完发现自己回到了刚才的地方，很神奇。",
+    "english_description": "I walked all the way around a flowerpot. When I finished, I was back where I started. Very mysterious.",
+    "author": "Auwuua"
+  },
+  {
+    "id": "small_adventure_doormat_guard",
+    "event_type": "small_adventure",
+    "chinese_description": "我守了一会儿门垫，没有什么事情发生，所以我觉得自己守得很好。",
+    "english_description": "I guarded a doormat for a while. Nothing happened, so I think I guarded it very well.",
+    "author": "Auwuua"
   }
 ]

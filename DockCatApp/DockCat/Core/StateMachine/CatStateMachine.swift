@@ -103,7 +103,8 @@ final class CatStateMachine {
 
     func updateVisiblePosition(_ point: CGPoint) {
         switch state {
-        case .transitioning, .walking, .resting, .dragged, .dialogue:
+        case .transitioning, .walking, .resting, .dragged, .dialogue,
+             .outing(.asking), .outing(.confirmingDeparture), .outing(.returned):
             position = point
         default:
             return

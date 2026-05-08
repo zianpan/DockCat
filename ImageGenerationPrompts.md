@@ -181,14 +181,9 @@ Create a small smooth pebble collectable with a rounded irregular oval shape, so
 
 Example output file: `collectables/pebble.png`
 
-### Small Feather
+### Feather
 
-Create a small feather collectable, light and gently curved, with a soft cream, pale gray, or muted tan color. The silhouette should be rounded and friendly rather than sharp, with a simple central shaft and only a few broad feather barbs so it remains readable at small size. It should feel like an ordinary outdoor bit the cat proudly carried home.
+Create a feather collectable, light and gently curved, with a soft cream, pale gray, or muted tan color. The silhouette should be rounded and friendly rather than sharp, with a simple central shaft and only a few broad feather barbs so it remains readable at small size. It should feel like an ordinary outdoor bit the cat proudly carried home.
 
-Example output file: `collectables/small_feather.png`
+Example output file: `collectables/feather.png`
 
-### Pretty Button
-
-Create a small pretty button collectable with a rounded circular shape, warm muted color such as dusty rose, soft teal, muted blue, or warm ivory, and two or four simple button holes. It should feel like a slightly special everyday find, more charming than rare, with a tiny highlight and clean simple shape. It should not look like a badge, jewel, coin, or piece of complete jewelry.
-
-Example output file: `collectables/pretty_button.png`

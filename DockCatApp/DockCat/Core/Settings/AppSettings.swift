@@ -15,6 +15,7 @@ struct AppSettings: Codable, Equatable {
     var walkDurationMaximum: TimeInterval
     var walkBaseSpeed: Double
     var catScalePercent: Double
+    var startPositionPercent: Double
     var activeOutingEndDate: Date?
     var activeOutingDuration: TimeInterval?
 
@@ -33,6 +34,7 @@ struct AppSettings: Codable, Equatable {
         case walkDurationMaximum
         case walkBaseSpeed
         case catScalePercent
+        case startPositionPercent
         case activeOutingEndDate
         case activeOutingDuration
     }
@@ -56,6 +58,7 @@ struct AppSettings: Codable, Equatable {
         walkDurationMaximum: 5 * 60,
         walkBaseSpeed: 36,
         catScalePercent: 10,
+        startPositionPercent: 75,
         activeOutingEndDate: nil,
         activeOutingDuration: nil
     )
@@ -75,6 +78,7 @@ struct AppSettings: Codable, Equatable {
         walkDurationMaximum: TimeInterval,
         walkBaseSpeed: Double,
         catScalePercent: Double,
+        startPositionPercent: Double,
         activeOutingEndDate: Date?,
         activeOutingDuration: TimeInterval?
     ) {
@@ -92,6 +96,7 @@ struct AppSettings: Codable, Equatable {
         self.walkDurationMaximum = walkDurationMaximum
         self.walkBaseSpeed = walkBaseSpeed
         self.catScalePercent = catScalePercent
+        self.startPositionPercent = startPositionPercent
         self.activeOutingEndDate = activeOutingEndDate
         self.activeOutingDuration = activeOutingDuration
     }
@@ -116,6 +121,7 @@ struct AppSettings: Codable, Equatable {
         walkDurationMaximum = try container.decodeIfPresent(TimeInterval.self, forKey: .walkDurationMaximum) ?? defaults.walkDurationMaximum
         walkBaseSpeed = try container.decodeIfPresent(Double.self, forKey: .walkBaseSpeed) ?? defaults.walkBaseSpeed
         catScalePercent = try container.decodeIfPresent(Double.self, forKey: .catScalePercent) ?? defaults.catScalePercent
+        startPositionPercent = try container.decodeIfPresent(Double.self, forKey: .startPositionPercent) ?? defaults.startPositionPercent
         activeOutingEndDate = try container.decodeIfPresent(Date.self, forKey: .activeOutingEndDate)
         activeOutingDuration = try container.decodeIfPresent(TimeInterval.self, forKey: .activeOutingDuration)
     }
@@ -136,6 +142,7 @@ struct AppSettings: Codable, Equatable {
         try container.encode(walkDurationMaximum, forKey: .walkDurationMaximum)
         try container.encode(walkBaseSpeed, forKey: .walkBaseSpeed)
         try container.encode(catScalePercent, forKey: .catScalePercent)
+        try container.encode(startPositionPercent, forKey: .startPositionPercent)
         try container.encodeIfPresent(activeOutingEndDate, forKey: .activeOutingEndDate)
         try container.encodeIfPresent(activeOutingDuration, forKey: .activeOutingDuration)
     }

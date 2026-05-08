@@ -89,11 +89,11 @@ final class CatWindowController {
         onSecondary: @escaping () -> Void
     ) {
         bubbleSize = textBubbleSize(message: message, width: 260, minimumHeight: 86)
+        bubbleView.isHidden = false
         updateLayoutPreservingAnchor(catSize: catView.frame.size)
         bubbleView.configure(message: message, primaryTitle: primaryTitle, secondaryTitle: secondaryTitle)
         bubbleView.onPrimary = { _ in onPrimary() }
         bubbleView.onSecondary = onSecondary
-        bubbleView.isHidden = false
     }
 
     func showBubble(
@@ -102,11 +102,11 @@ final class CatWindowController {
         onPrimary: @escaping () -> Void
     ) {
         bubbleSize = textBubbleSize(message: message, width: 260, minimumHeight: 86)
+        bubbleView.isHidden = false
         updateLayoutPreservingAnchor(catSize: catView.frame.size)
         bubbleView.configure(message: message, primaryTitle: primaryTitle, secondaryTitle: nil)
         bubbleView.onPrimary = { _ in onPrimary() }
         bubbleView.onSecondary = nil
-        bubbleView.isHidden = false
     }
 
     func showImageBubble(
@@ -115,13 +115,13 @@ final class CatWindowController {
         primaryTitle: String,
         onPrimary: @escaping () -> Void
     ) {
-        let minimumHeight: CGFloat = image == nil ? 86 : 166
+        let minimumHeight: CGFloat = image == nil ? 86 : 180
         bubbleSize = imageBubbleSize(message: message, width: 260, minimumHeight: minimumHeight, hasImage: image != nil)
+        bubbleView.isHidden = false
         updateLayoutPreservingAnchor(catSize: catView.frame.size)
         bubbleView.configureImage(message: message, image: image, primaryTitle: primaryTitle)
         bubbleView.onPrimary = { _ in onPrimary() }
         bubbleView.onSecondary = nil
-        bubbleView.isHidden = false
     }
 
     func showInputBubble(
@@ -133,11 +133,11 @@ final class CatWindowController {
         onSecondary: @escaping () -> Void
     ) {
         bubbleSize = inputBubbleSize(message: message, width: 260, minimumHeight: 112)
+        bubbleView.isHidden = false
         updateLayoutPreservingAnchor(catSize: catView.frame.size)
         bubbleView.configureInput(message: message, value: value, primaryTitle: primaryTitle, secondaryTitle: secondaryTitle)
         bubbleView.onPrimary = { value in onPrimary(value ?? "") }
         bubbleView.onSecondary = onSecondary
-        bubbleView.isHidden = false
     }
 
     func hideBubble() {
@@ -159,8 +159,10 @@ final class CatWindowController {
     }
 
     private func updateLayout(catSize: CGSize) {
-        let rootWidth = max(catSize.width, bubbleSize.width)
-        let rootHeight = catSize.height + bubbleSize.height + 16
+        let activeBubbleSize = bubbleView.isHidden ? .zero : bubbleSize
+        let bubbleSpacing: CGFloat = bubbleView.isHidden ? 0 : 16
+        let rootWidth = max(catSize.width, activeBubbleSize.width)
+        let rootHeight = catSize.height + activeBubbleSize.height + bubbleSpacing
         rootView.frame = NSRect(x: 0, y: 0, width: rootWidth, height: rootHeight)
         catView.frame = NSRect(
             x: (rootWidth - catSize.width) / 2,
@@ -169,10 +171,10 @@ final class CatWindowController {
             height: catSize.height
         )
         bubbleView.frame = NSRect(
-            x: (rootWidth - bubbleSize.width) / 2,
+            x: (rootWidth - activeBubbleSize.width) / 2,
             y: catSize.height + 8,
-            width: bubbleSize.width,
-            height: bubbleSize.height
+            width: activeBubbleSize.width,
+            height: activeBubbleSize.height
         )
         panel.setContentSize(rootView.frame.size)
     }
@@ -197,7 +199,7 @@ final class CatWindowController {
 
     private func imageBubbleSize(message: String, width: CGFloat, minimumHeight: CGFloat, hasImage: Bool) -> CGSize {
         let textHeight = measuredTextHeight(message, width: width - 20)
-        let imageBlockHeight: CGFloat = hasImage ? 82 : 0
+        let imageBlockHeight: CGFloat = hasImage ? 96 : 0
         return CGSize(width: width, height: max(minimumHeight, ceil(textHeight) + imageBlockHeight + 64))
     }
 
