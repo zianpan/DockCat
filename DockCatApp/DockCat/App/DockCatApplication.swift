@@ -62,6 +62,7 @@ final class DockCatApplication: NSObject, NSApplicationDelegate {
             collectableInventory: collectableInventory,
             dialogueImage: renderer.randomPose(for: .dialogue).image
         )
+        configureSettingsAssetPackActions()
         catWindow.setImageScale(percent: settings.catScalePercent)
         configureStateMachine()
         configureInteraction()
@@ -215,6 +216,39 @@ final class DockCatApplication: NSObject, NSApplicationDelegate {
                 : self.startPositionAnchor()
             self.updateCurrentPositionPreservingState(point)
             self.updateStateMachineParameters()
+        }
+    }
+
+    private func configureSettingsAssetPackActions() {
+        settingsWindowController.assetPackIDsProvider = { [weak self] in
+            guard let self else { return [] }
+            return self.assetLoader.customPackIDs()
+        }
+        settingsWindowController.onOpenAssetPacksFolder = { [weak self] in
+            guard let self else { return }
+            self.assetLoader.prepareCustomPacksDirectory()
+            NSWorkspace.shared.open(self.assetLoader.customPacksRoot())
+        }
+        settingsWindowController.onLoadAssetPack = { [weak self] selectedID in
+            guard let self else {
+                return AssetPackPreviewResult(
+                    report: AssetPackValidationReport(
+                        requestedID: selectedID,
+                        pack: nil,
+                        errorDescription: "DockCat 尚未准备好资源包加载器。",
+                        poseStatuses: [],
+                        walkFrameCount: 0,
+                        hasValidSleepIcon: false,
+                        hasValidEmptyIcon: false
+                    ),
+                    dialogueImage: nil
+                )
+            }
+            let report = self.assetLoader.validationReport(for: selectedID)
+            let previewImage = report.pack.map {
+                PoseRenderer(pack: $0, fallbackPack: self.defaultAssetPack).randomPose(for: .dialogue).image
+            } ?? self.renderer.randomPose(for: .dialogue).image
+            return AssetPackPreviewResult(report: report, dialogueImage: previewImage)
         }
     }
 
@@ -741,7 +775,8 @@ final class DockCatApplication: NSObject, NSApplicationDelegate {
     }
 
     private func stableWalkSourceSize() -> CGSize {
-        let manifestSize = CGSize(width: assetPack.manifest.canvasWidth, height: assetPack.manifest.canvasHeight)
+        let sourcePack = renderer.walkAnimationSourcePack() ?? assetPack!
+        let manifestSize = CGSize(width: sourcePack.manifest.canvasWidth, height: sourcePack.manifest.canvasHeight)
         if manifestSize.width > 0, manifestSize.height > 0 {
             return manifestSize
         }

@@ -11,6 +11,22 @@ final class SettingsWindowController: NSObject, NSWindowDelegate {
     private var collectableInventory: CollectableInventory
     private var dialogueImage: NSImage?
     var onSave: ((AppSettings) -> Void)?
+    var assetPackIDsProvider: () -> [String] = { [] }
+    var onOpenAssetPacksFolder: () -> Void = {}
+    var onLoadAssetPack: (String) -> AssetPackPreviewResult = { id in
+        AssetPackPreviewResult(
+            report: AssetPackValidationReport(
+                requestedID: id,
+                pack: nil,
+                errorDescription: "资源包加载器尚未准备好。",
+                poseStatuses: [],
+                walkFrameCount: 0,
+                hasValidSleepIcon: false,
+                hasValidEmptyIcon: false
+            ),
+            dialogueImage: nil
+        )
+    }
 
     init(
         store: SettingsStore,
@@ -77,7 +93,11 @@ final class SettingsWindowController: NSObject, NSWindowDelegate {
             usageStatistics: usageStatistics,
             outingCatalog: outingCatalog,
             collectableInventory: collectableInventory,
-            dialogueImage: dialogueImage
+            dialogueImage: dialogueImage,
+            availableAssetPackIDs: assetPackIDsProvider(),
+            onOpenAssetPacksFolder: onOpenAssetPacksFolder,
+            onReloadAssetPackIDs: assetPackIDsProvider,
+            onLoadAssetPack: onLoadAssetPack
         ) { [weak self] updated in
             guard let self else { return }
             self.settings = updated

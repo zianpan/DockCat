@@ -89,6 +89,16 @@ final class PoseRenderer {
         return SpriteAnimation(frames: fallback, fps: animation.fps, loops: true)
     }
 
+    func walkAnimationSourcePack() -> CatAssetPack? {
+        if !walkFramesFromDirectory(in: pack).isEmpty {
+            return pack
+        }
+        if let fallbackPack, !walkFramesFromDirectory(in: fallbackPack).isEmpty {
+            return fallbackPack
+        }
+        return nil
+    }
+
     private func walkFramesFromDirectory() -> [NSImage] {
         walkFramesFromDirectory(in: pack)
     }

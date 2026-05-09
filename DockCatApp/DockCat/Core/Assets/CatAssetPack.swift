@@ -4,7 +4,10 @@ struct CatAssetPack: Equatable {
     var manifest: AssetManifest
     var rootURL: URL
 
-    var id: String { manifest.id }
+    var id: String {
+        let folderName = rootURL.lastPathComponent
+        return folderName == "DefaultCat" ? manifest.id : folderName
+    }
 
     var restingPosesDirectoryURL: URL {
         poseDirectoryURL(manifest.poses.resting)
