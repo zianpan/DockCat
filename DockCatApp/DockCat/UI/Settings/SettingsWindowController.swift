@@ -74,7 +74,7 @@ final class SettingsWindowController: NSObject, NSWindowDelegate {
         let hosting = NSHostingController(rootView: view)
         let window = NSWindow(contentViewController: hosting)
         window.title = "DockCat 设置"
-        window.setContentSize(NSSize(width: 520, height: 500))
+        window.setContentSize(NSSize(width: 520, height: 580))
         window.styleMask = [.titled, .closable, .miniaturizable]
         window.isReleasedWhenClosed = false
         window.delegate = self
@@ -117,7 +117,7 @@ final class SettingsWindowController: NSObject, NSWindowDelegate {
     }
 
     private func centerOnActiveScreen(_ window: NSWindow) {
-        guard let screen = NSScreen.main ?? window.screen ?? NSScreen.screens.first else {
+        guard let screen = DockGeometry.currentActivityScreen(activityDisplayID: settings.activityDisplayID) ?? window.screen else {
             window.center()
             return
         }

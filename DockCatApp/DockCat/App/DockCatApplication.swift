@@ -5,6 +5,7 @@ final class DockCatApplication: NSObject, NSApplicationDelegate {
     private let settingsStore = SettingsStore()
     private let usageStatisticsStore = UsageStatisticsStore()
     private let collectableInventoryStore = CollectableInventoryStore()
+    private let userDataBackupStore = UserDataBackupStore()
     private let outingCatalogLoader = OutingCatalogLoader()
     private let outingWakeResolver = OutingWakeResolver()
     private let assetLoader = AssetPackLoader()
@@ -17,7 +18,10 @@ final class DockCatApplication: NSObject, NSApplicationDelegate {
     private let walkAnimator = SpriteAnimator()
 
     private var settings: AppSettings = .defaults
-    private var activitySpace = DockGeometry.currentMainDisplaySpace(startPositionPercent: AppSettings.defaults.startPositionPercent)
+    private var activitySpace = DockGeometry.currentActivitySpace(
+        activityDisplayID: AppSettings.defaults.activityDisplayID,
+        startPositionPercent: AppSettings.defaults.startPositionPercent
+    )
     private var outingCatalog: OutingCatalog = .empty
     private var collectableInventory: CollectableInventory = .empty
     private var defaultAssetPack: CatAssetPack!
@@ -42,7 +46,7 @@ final class DockCatApplication: NSObject, NSApplicationDelegate {
     func applicationDidFinishLaunching(_ notification: Notification) {
         RuntimeDiagnostics.record("applicationDidFinishLaunching")
         settings = settingsStore.load()
-        activitySpace = DockGeometry.currentMainDisplaySpace(startPositionPercent: settings.startPositionPercent)
+        activitySpace = currentActivitySpace()
         outingCatalog = outingCatalogLoader.loadCatalog()
         collectableInventory = collectableInventoryStore.load()
         configureUsageSessionTracker()
@@ -86,6 +90,7 @@ final class DockCatApplication: NSObject, NSApplicationDelegate {
         outingTimer?.invalidate()
         stopWalk()
         usageSessionTracker.stop()
+        saveUserDataBackup()
         removeUsageSessionObservers()
     }
 
@@ -203,6 +208,7 @@ final class DockCatApplication: NSObject, NSApplicationDelegate {
             guard let self else { return }
             let previousAssetPackID = self.settings.selectedAssetPackID
             let previousStartPositionPercent = self.settings.startPositionPercent
+            let previousActivityDisplayID = self.settings.activityDisplayID
             self.settings = updated
             self.reminderScheduler.updateSettings(updated)
             if updated.selectedAssetPackID != previousAssetPackID {
@@ -210,13 +216,24 @@ final class DockCatApplication: NSObject, NSApplicationDelegate {
                 self.applyState(self.stateMachine.state)
             }
             self.catWindow.setImageScale(percent: updated.catScalePercent)
-            self.activitySpace = DockGeometry.currentMainDisplaySpace(startPositionPercent: updated.startPositionPercent)
-            let point = updated.startPositionPercent == previousStartPositionPercent
+            self.activitySpace = self.currentActivitySpace()
+            let shouldKeepCurrentPosition = updated.startPositionPercent == previousStartPositionPercent
+                && updated.activityDisplayID == previousActivityDisplayID
+            let point = shouldKeepCurrentPosition
                 ? self.clampedCatPoint(self.stateMachine.position)
                 : self.startPositionAnchor()
             self.updateCurrentPositionPreservingState(point)
             self.updateStateMachineParameters()
+            self.saveUserDataBackup()
         }
+    }
+
+    private func saveUserDataBackup() {
+        userDataBackupStore.save(
+            settings: settings,
+            usageStatistics: usageSessionTracker.snapshot,
+            collectableInventory: collectableInventory
+        )
     }
 
     private func configureSettingsAssetPackActions() {
@@ -331,12 +348,19 @@ final class DockCatApplication: NSObject, NSApplicationDelegate {
     private func configureDockObserver() {
         dockObserver.onChange = { [weak self] in
             guard let self else { return }
-            self.activitySpace = DockGeometry.currentMainDisplaySpace(startPositionPercent: self.settings.startPositionPercent)
+            self.activitySpace = self.currentActivitySpace()
             let clamped = self.clampedCatPoint(self.stateMachine.position)
             self.stateMachine.updateVisiblePosition(clamped)
             self.catWindow.setAnchor(clamped)
         }
         dockObserver.start()
+    }
+
+    private func currentActivitySpace() -> ActivitySpace {
+        DockGeometry.currentActivitySpace(
+            activityDisplayID: settings.activityDisplayID,
+            startPositionPercent: settings.startPositionPercent
+        )
     }
 
     private func applyState(_ state: CatState) {

@@ -71,14 +71,16 @@ struct AssetPackComboBox: NSViewRepresentable {
 struct SettingsView: View {
     @State private var draft: AppSettings
     @State private var availableAssetPackIDs: [String]
+    @State private var displayOptions: [DisplaySelectionOption]
     @State private var previewImage: NSImage?
     private let usageStatistics: UsageStatistics
     private let outingCatalog: OutingCatalog
     private let collectableInventory: CollectableInventory
     private let labelWidth: CGFloat = 112
     private let controlWidth: CGFloat = 196
+    private let displayControlWidth: CGFloat = 240
     private let rowSpacing: CGFloat = 6
-    private let panelWidth: CGFloat = 360
+    private let panelWidth: CGFloat = 420
     private var assetInputWidth: CGFloat { controlWidth }
     private var rowWidth: CGFloat { labelWidth + rowSpacing + controlWidth }
     private let onOpenAssetPacksFolder: () -> Void
@@ -100,6 +102,7 @@ struct SettingsView: View {
     ) {
         _draft = State(initialValue: settings)
         _availableAssetPackIDs = State(initialValue: availableAssetPackIDs)
+        _displayOptions = State(initialValue: DockGeometry.currentDisplaySelectionOptions())
         _previewImage = State(initialValue: dialogueImage)
         self.usageStatistics = usageStatistics
         self.outingCatalog = outingCatalog
@@ -139,7 +142,7 @@ struct SettingsView: View {
             }
             .padding(14)
         }
-        .frame(width: 520, height: 500)
+        .frame(width: 520, height: 580)
         .background(Color(nsColor: .windowBackgroundColor))
     }
 
@@ -211,31 +214,44 @@ struct SettingsView: View {
 
     private var parametersTab: some View {
         VStack(alignment: .center, spacing: 14) {
-            GroupBox {
-                VStack(alignment: .leading, spacing: 10) {
-                    Toggle("开启提醒模式", isOn: $draft.remindersEnabled)
-                        .frame(width: labelWidth + controlWidth, alignment: .leading)
+            settingsPanel(
+                title: {
+                    HStack(spacing: 12) {
+                        sectionTitle("提醒设置")
+                        Toggle("", isOn: $draft.remindersEnabled)
+                            .toggleStyle(.checkbox)
+                            .labelsHidden()
+                        Text("开启提醒模式")
+                            .font(.system(size: 14))
+                        Spacer()
+                    }
+                },
+                content: {
                     compactStepper("喝水提醒", value: minutesBinding(\.waterReminderInterval), range: 1...240, step: 5, suffix: "分钟")
                     compactStepper("久坐提醒", value: minutesBinding(\.movementReminderInterval), range: 5...360, step: 5, suffix: "分钟")
                     compactStepper("默认出门时长", value: minutesBinding(\.defaultOutingDuration), range: 5...480, step: 5, suffix: "分钟")
                 }
-                .padding(.vertical, 6)
-            } label: {
-                sectionTitle("提醒设置")
-            }
-            .frame(width: panelWidth)
+            )
 
-            GroupBox {
-                VStack(alignment: .leading, spacing: 10) {
+            settingsPanel(
+                title: {
+                    sectionTitle("状态参数")
+                },
+                content: {
                     rangeRow("休息时长", minimum: minutesBinding(\.restDurationMinimum), maximum: minutesBinding(\.restDurationMaximum), range: 1...480)
                     rangeRow("散步时长", minimum: minutesBinding(\.walkDurationMinimum), maximum: minutesBinding(\.walkDurationMaximum), range: 1...480)
                     compactStepper("散步基础速度", value: speedBinding, range: 8...240, step: 4, suffix: "px/s")
                 }
-                .padding(.vertical, 6)
-            } label: {
-                sectionTitle("状态参数")
-            }
-            .frame(width: panelWidth)
+            )
+
+            settingsPanel(
+                title: {
+                    sectionTitle("多显示器设置")
+                },
+                content: {
+                    displaySelectionRow
+                }
+            )
 
             Spacer()
         }
@@ -246,6 +262,27 @@ struct SettingsView: View {
     private func sectionTitle(_ title: String) -> some View {
         Text(title)
             .font(.system(size: 14, weight: .semibold))
+    }
+
+    private func settingsPanel<Title: View, Content: View>(
+        @ViewBuilder title: () -> Title,
+        @ViewBuilder content: () -> Content
+    ) -> some View {
+        VStack(alignment: .leading, spacing: 6) {
+            title()
+                .frame(width: panelWidth, alignment: .leading)
+            GroupBox {
+                VStack(alignment: .center, spacing: 10) {
+                    content()
+                }
+                .frame(maxWidth: .infinity, alignment: .center)
+                .padding(.vertical, 6)
+            } label: {
+                EmptyView()
+            }
+            .frame(width: panelWidth)
+        }
+        .frame(width: panelWidth, alignment: .leading)
     }
 
     private var aboutTab: some View {
@@ -278,7 +315,7 @@ struct SettingsView: View {
     }
 
     private var appVersion: String {
-        Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "0.3"
+        Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "0.4"
     }
 
     private var projectURL: URL {
@@ -330,13 +367,29 @@ struct SettingsView: View {
                     }
                     .frame(maxWidth: .infinity, alignment: .center)
                 }
-                .frame(height: 220)
+                .frame(height: 260)
             }
 
             Spacer()
         }
         .padding(.top, 12)
         .padding(.horizontal, 14)
+    }
+
+    private var displaySelectionRow: some View {
+        HStack(spacing: rowSpacing) {
+            Text("猫咪出现在")
+                .frame(width: labelWidth, alignment: .trailing)
+            Picker("", selection: $draft.activityDisplayID) {
+                ForEach(displayOptions) { option in
+                    Text(option.title)
+                        .tag(option.displayID)
+                }
+            }
+            .labelsHidden()
+            .frame(width: displayControlWidth, alignment: .leading)
+        }
+        .frame(width: labelWidth + rowSpacing + displayControlWidth, alignment: .center)
     }
 
     private var acquiredCollectables: [CollectableDisplayItem] {

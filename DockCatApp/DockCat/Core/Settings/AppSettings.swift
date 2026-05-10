@@ -16,6 +16,7 @@ struct AppSettings: Codable, Equatable {
     var walkBaseSpeed: Double
     var catScalePercent: Double
     var startPositionPercent: Double
+    var activityDisplayID: UInt32?
     var activeOutingEndDate: Date?
     var activeOutingDuration: TimeInterval?
 
@@ -35,6 +36,7 @@ struct AppSettings: Codable, Equatable {
         case walkBaseSpeed
         case catScalePercent
         case startPositionPercent
+        case activityDisplayID
         case activeOutingEndDate
         case activeOutingDuration
     }
@@ -59,6 +61,7 @@ struct AppSettings: Codable, Equatable {
         walkBaseSpeed: 36,
         catScalePercent: 10,
         startPositionPercent: 75,
+        activityDisplayID: nil,
         activeOutingEndDate: nil,
         activeOutingDuration: nil
     )
@@ -79,6 +82,7 @@ struct AppSettings: Codable, Equatable {
         walkBaseSpeed: Double,
         catScalePercent: Double,
         startPositionPercent: Double,
+        activityDisplayID: UInt32?,
         activeOutingEndDate: Date?,
         activeOutingDuration: TimeInterval?
     ) {
@@ -97,6 +101,7 @@ struct AppSettings: Codable, Equatable {
         self.walkBaseSpeed = walkBaseSpeed
         self.catScalePercent = catScalePercent
         self.startPositionPercent = startPositionPercent
+        self.activityDisplayID = activityDisplayID
         self.activeOutingEndDate = activeOutingEndDate
         self.activeOutingDuration = activeOutingDuration
     }
@@ -122,6 +127,7 @@ struct AppSettings: Codable, Equatable {
         walkBaseSpeed = try container.decodeIfPresent(Double.self, forKey: .walkBaseSpeed) ?? defaults.walkBaseSpeed
         catScalePercent = try container.decodeIfPresent(Double.self, forKey: .catScalePercent) ?? defaults.catScalePercent
         startPositionPercent = try container.decodeIfPresent(Double.self, forKey: .startPositionPercent) ?? defaults.startPositionPercent
+        activityDisplayID = try container.decodeIfPresent(UInt32.self, forKey: .activityDisplayID)
         activeOutingEndDate = try container.decodeIfPresent(Date.self, forKey: .activeOutingEndDate)
         activeOutingDuration = try container.decodeIfPresent(TimeInterval.self, forKey: .activeOutingDuration)
     }
@@ -143,6 +149,7 @@ struct AppSettings: Codable, Equatable {
         try container.encode(walkBaseSpeed, forKey: .walkBaseSpeed)
         try container.encode(catScalePercent, forKey: .catScalePercent)
         try container.encode(startPositionPercent, forKey: .startPositionPercent)
+        try container.encodeIfPresent(activityDisplayID, forKey: .activityDisplayID)
         try container.encodeIfPresent(activeOutingEndDate, forKey: .activeOutingEndDate)
         try container.encodeIfPresent(activeOutingDuration, forKey: .activeOutingDuration)
     }
