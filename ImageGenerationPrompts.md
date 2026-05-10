@@ -12,7 +12,7 @@ This file records the ChatGPT prompts we used to generate DockCat art assets: de
 
 For cat assets, start with `Cat > General Art Style`, then combine it with either the static posture prompt template or the animation frame prompt template. Replace the bracketed placeholders with the posture, motion plan, frame count, and output paths you need.
 
-For one-off assets, use the relevant example prompt as a tested starting point. The examples intentionally omit file-format requirements already covered by the templates, so add the template requirements when generating production images.
+For one-off assets, you can use the example prompt as a tested starting point. The examples omit file-format requirements already covered by the templates, so add the template requirements when generating production images.
 
 For custom cats, upload reference photos before prompting. The prompt assumes ChatGPT can see those references and should preserve the cat's identity: coat color, markings, fur length, body shape, facial features, and overall personality.
 

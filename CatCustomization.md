@@ -54,7 +54,7 @@ my-cat/
 
 DockCat scans each pose folder and loads every loadable image file in that folder. You can use whatever filename for the images, but clear names make your pack more readable.
 
-When the cat switch to a pose, DockCat randomly presents one image from the corresponding folder. You can add any numbers of images you would like your cat to have for each pose.
+When the cat switch to a pose, DockCat randomly presents one image from the corresponding folder. You can add any number of images you would like your cat to have for each pose.
 
 - `poses/resting/`: one or more resting poses. 
 - `poses/held/`: one or more poses used while the cat is being dragged.
@@ -112,7 +112,7 @@ Field notes:
 - `id`: compatibility and description field. DockCat selects packs by folder name, so this does not need to match the resource pack ID entered in Settings > Pet. However, if you would like to share your pack with the community, we recommend changing it to a unique id.
 - `name`: Name of the cat.
 - `author`: creator name.
-- `canvas_width` and `canvas_height`: source PNG canvas size.
+- `canvas_width` and `canvas_height`: stable canvas size for walking animation rendering. Change these values when your walk frames use a different intended canvas size. Static pose images do not use these manifest values for display size; they are shown from their actual PNG dimensions.
 - `default_anchor`: reserved for pack metadata. Keep `{ "x": 0.5, "y": 0.88 }` unless the app adds anchor editing later.
 - `poses`: optional for preview packs. Omitted keys default to `poses/resting`, `poses/held`, `poses/dialogue`, and `poses/transition`.
 - `animations.walk.fps`: walking animation playback speed. `3` is a good starting point.
@@ -154,7 +154,7 @@ After adding or changing a custom pack:
 4. Click `加载所选` to rescan and validate the pack.
 5. Save.
 
-When changing only Settings values, saving is enough. When changing files inside a pack, click `加载所选` so the asset scanner sees the new files. Icon file updates still require restarting DockCat.
+When changing only Settings values, saving is enough. When changing image files inside a pack, click `加载所选` so the asset scanner sees the new files. If you change `manifest.json`, restart DockCat so the app reloads the manifest values. Icon file updates also require restarting DockCat.
 
 ## Troubleshooting
 
@@ -169,11 +169,11 @@ If the pack does not appear:
 If only some states show your cat:
 
 - The missing states are using default fallback assets.
-- Add images to the matching folder: `resting`, `held`, `dialogue`, `transition`, or `animations/walk`.
+- Check images in the matching folder: `resting`, `held`, `dialogue`, `transition`, or `animations/walk`.
 
 If the cat jumps when changing poses:
 
-- Make every PNG use the same canvas size.
+- Make every PNG use the similar canvas size.
 - Align the cat body and paw-bottom consistently across all pose files.
 - Keep transparent margins consistent.
 
@@ -181,14 +181,9 @@ If the walk animation plays in the wrong order:
 
 - Rename frames so filename sorting matches playback order, for example `walk_01.png`, `walk_02.png`, `walk_03.png`.
 
-## Final Pack Checklist
+If the walking cat is much smaller or larger than other states:
 
-Before sharing a finished pack, confirm:
+- Open `manifest.json` and adjust `canvas_width` and `canvas_height` to match the intended walking animation canvas.
+- For example, if your walk frames are designed around a `1500 x 1500 px` canvas, set both values to `1500`.
+- Restart DockCat after changing `manifest.json`.
 
-- `manifest.json` parses and the folder name is the intended pack ID.
-- Every pose type has at least one readable PNG.
-- `animations/walk/` has readable frames in the right order.
-- All pose and walk files use the same canvas size.
-- The cat keeps a consistent visual scale and bottom anchor.
-- The pack does not depend on default fallback assets unless that is intentional.
-- Optional app icons are `1024 x 1024 px` and visually matched.
