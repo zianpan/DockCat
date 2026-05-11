@@ -35,7 +35,7 @@ final class CatStateMachine {
             LongDurationState.allCases.randomElement() ?? .resting
         },
         randomTransitionInsertion: @escaping RandomTransitionInsertion = {
-            Bool.random()
+            Double.random(in: 0..<1) < (1.0 / 3.0)
         }
     ) {
         self.state = initialState

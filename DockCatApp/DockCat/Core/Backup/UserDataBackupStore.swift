@@ -21,6 +21,7 @@ struct UserDataBackupSnapshot: Codable, Equatable {
 }
 
 struct UserDataBackupSettings: Codable, Equatable {
+    var language: AppLanguage
     var catName: String
     var catIdentifier: String
     var userSalutation: String
@@ -39,6 +40,7 @@ struct UserDataBackupSettings: Codable, Equatable {
     var activityDisplayID: UInt32?
 
     init(settings: AppSettings) {
+        language = settings.language
         catName = settings.catName
         catIdentifier = settings.catIdentifier
         userSalutation = settings.userSalutation

@@ -7,15 +7,16 @@ final class CatMenuController {
     var onSettings: (() -> Void)?
     var onSleep: (() -> Void)?
 
-    func show(snapshot: CatStatusSnapshot, at event: NSEvent, in view: NSView) {
+    func show(snapshot: CatStatusSnapshot, language: AppLanguage, at event: NSEvent, in view: NSView) {
+        let strings = AppStrings(language: language)
         let menu = NSMenu()
-        menu.addItem(CatStatusMenuPresenter.statusItem(snapshot: snapshot))
+        menu.addItem(CatStatusMenuPresenter.statusItem(snapshot: snapshot, language: language))
         menu.addItem(NSMenuItem.separator())
-        menu.addItem(NSMenuItem(title: "摸摸 (改变姿势)", action: #selector(pet), keyEquivalent: ""))
-        menu.addItem(NSMenuItem(title: "出门玩吧 (专注模式)", action: #selector(outing), keyEquivalent: ""))
+        menu.addItem(NSMenuItem(title: strings.menuPet, action: #selector(pet), keyEquivalent: ""))
+        menu.addItem(NSMenuItem(title: strings.menuGoOut, action: #selector(outing), keyEquivalent: ""))
         menu.addItem(NSMenuItem.separator())
-        menu.addItem(NSMenuItem(title: "设置", action: #selector(settings), keyEquivalent: ","))
-        menu.addItem(NSMenuItem(title: "去睡觉吧 (退出应用)", action: #selector(sleep), keyEquivalent: "q"))
+        menu.addItem(NSMenuItem(title: strings.menuSettings, action: #selector(settings), keyEquivalent: ","))
+        menu.addItem(NSMenuItem(title: strings.menuSleep, action: #selector(sleep), keyEquivalent: "q"))
         for item in menu.items {
             item.target = self
         }

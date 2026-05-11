@@ -71,7 +71,6 @@ struct AssetPackComboBox: NSViewRepresentable {
 struct SettingsView: View {
     @State private var draft: AppSettings
     @State private var availableAssetPackIDs: [String]
-    @State private var displayOptions: [DisplaySelectionOption]
     @State private var previewImage: NSImage?
     private let usageStatistics: UsageStatistics
     private let outingCatalog: OutingCatalog
@@ -81,6 +80,7 @@ struct SettingsView: View {
     private let displayControlWidth: CGFloat = 240
     private let rowSpacing: CGFloat = 6
     private let panelWidth: CGFloat = 420
+    private let statisticsContentWidth: CGFloat = 392
     private var assetInputWidth: CGFloat { controlWidth }
     private var rowWidth: CGFloat { labelWidth + rowSpacing + controlWidth }
     private let onOpenAssetPacksFolder: () -> Void
@@ -102,7 +102,6 @@ struct SettingsView: View {
     ) {
         _draft = State(initialValue: settings)
         _availableAssetPackIDs = State(initialValue: availableAssetPackIDs)
-        _displayOptions = State(initialValue: DockGeometry.currentDisplaySelectionOptions())
         _previewImage = State(initialValue: dialogueImage)
         self.usageStatistics = usageStatistics
         self.outingCatalog = outingCatalog
@@ -113,20 +112,24 @@ struct SettingsView: View {
         self.onSave = onSave
     }
 
+    private var strings: AppStrings {
+        AppStrings(language: draft.language)
+    }
+
     var body: some View {
         VStack(spacing: 0) {
             TabView {
                 petTab
-                    .tabItem { Text("猫咪设置") }
+                    .tabItem { Text(strings.settingsPetTab) }
 
                 parametersTab
-                    .tabItem { Text("参数设置") }
+                    .tabItem { Text(strings.settingsParametersTab) }
 
                 collectablesTab
-                    .tabItem { Text("收藏品箱") }
+                    .tabItem { Text(strings.settingsCollectablesTab) }
 
                 aboutTab
-                    .tabItem { Text("关于") }
+                    .tabItem { Text(strings.settingsAboutTab) }
             }
             .padding(.horizontal, 18)
             .padding(.top, 14)
@@ -135,7 +138,7 @@ struct SettingsView: View {
 
             HStack {
                 Spacer()
-                Button("保存") {
+                Button(strings.settingsSave) {
                     onSave(normalized(draft))
                 }
                 .keyboardShortcut(.defaultAction)
@@ -154,12 +157,13 @@ struct SettingsView: View {
             HStack {
                 Spacer()
                 VStack(alignment: .leading, spacing: 12) {
-                    compactTextField("猫咪名字", text: $draft.catName)
-                    compactTextField("对你的称呼", text: $draft.userSalutation)
+                    compactTextField(strings.settingsCatName, text: $draft.catName)
+                    compactTextField(strings.settingsSalutation, text: $draft.userSalutation)
+                    languageRow
                     assetPackRow
                     assetPackActionsRow
-                    compactStepper("缩放", value: scaleBinding, range: 1...100, step: 1, suffix: "%")
-                    compactStepper("起始出现位置", value: startPositionBinding, range: 0...100, step: 1, suffix: "%")
+                    compactStepper(strings.settingsScale, value: scaleBinding, range: 1...100, step: 1, suffix: "%")
+                    compactStepper(strings.settingsStartPosition, value: startPositionBinding, range: 0...100, step: 1, suffix: "%")
                 }
                 .frame(width: rowWidth, alignment: .leading)
                 Spacer()
@@ -185,10 +189,25 @@ struct SettingsView: View {
 
     private var assetPackRow: some View {
         HStack(spacing: rowSpacing) {
-            Text("资源包 ID")
+            Text(strings.settingsAssetPackID)
                 .frame(width: labelWidth, alignment: .trailing)
             AssetPackComboBox(text: $draft.selectedAssetPackID, items: availableAssetPackIDs)
                 .frame(width: assetInputWidth, height: 22)
+        }
+        .frame(width: rowWidth, alignment: .leading)
+    }
+
+    private var languageRow: some View {
+        HStack(spacing: rowSpacing) {
+            Text(strings.settingsLanguage)
+                .frame(width: labelWidth, alignment: .trailing)
+            Picker("", selection: $draft.language) {
+                Text("中文").tag(AppLanguage.chinese)
+                Text("English").tag(AppLanguage.english)
+            }
+            .pickerStyle(.segmented)
+            .labelsHidden()
+            .frame(width: controlWidth)
         }
         .frame(width: rowWidth, alignment: .leading)
     }
@@ -198,12 +217,12 @@ struct SettingsView: View {
             Spacer()
                 .frame(width: labelWidth)
             HStack(spacing: rowSpacing) {
-                Button("打开资源包位置") {
+                Button(strings.settingsOpenAssetPackFolder) {
                     onOpenAssetPacksFolder()
                     availableAssetPackIDs = onReloadAssetPackIDs()
                 }
                 Spacer(minLength: 0)
-                Button("加载所选") {
+                Button(strings.settingsLoadSelected) {
                     loadSelectedAssetPack()
                 }
             }
@@ -217,36 +236,36 @@ struct SettingsView: View {
             settingsPanel(
                 title: {
                     HStack(spacing: 12) {
-                        sectionTitle("提醒设置")
+                        sectionTitle(strings.settingsReminderSection)
                         Toggle("", isOn: $draft.remindersEnabled)
                             .toggleStyle(.checkbox)
                             .labelsHidden()
-                        Text("开启提醒模式")
+                        Text(strings.settingsReminderEnabled)
                             .font(.system(size: 14))
                         Spacer()
                     }
                 },
                 content: {
-                    compactStepper("喝水提醒", value: minutesBinding(\.waterReminderInterval), range: 1...240, step: 5, suffix: "分钟")
-                    compactStepper("久坐提醒", value: minutesBinding(\.movementReminderInterval), range: 5...360, step: 5, suffix: "分钟")
-                    compactStepper("默认出门时长", value: minutesBinding(\.defaultOutingDuration), range: 5...480, step: 5, suffix: "分钟")
+                    compactStepper(strings.settingsWaterReminder, value: minutesBinding(\.waterReminderInterval), range: 1...240, step: 5, suffix: strings.minuteUnit)
+                    compactStepper(strings.settingsMovementReminder, value: minutesBinding(\.movementReminderInterval), range: 5...360, step: 5, suffix: strings.minuteUnit)
+                    compactStepper(strings.settingsDefaultOutingDuration, value: minutesBinding(\.defaultOutingDuration), range: 5...480, step: 5, suffix: strings.minuteUnit)
                 }
             )
 
             settingsPanel(
                 title: {
-                    sectionTitle("状态参数")
+                    sectionTitle(strings.settingsStateSection)
                 },
                 content: {
-                    rangeRow("休息时长", minimum: minutesBinding(\.restDurationMinimum), maximum: minutesBinding(\.restDurationMaximum), range: 1...480)
-                    rangeRow("散步时长", minimum: minutesBinding(\.walkDurationMinimum), maximum: minutesBinding(\.walkDurationMaximum), range: 1...480)
-                    compactStepper("散步基础速度", value: speedBinding, range: 8...240, step: 4, suffix: "px/s")
+                    rangeRow(strings.settingsRestDuration, minimum: minutesBinding(\.restDurationMinimum), maximum: minutesBinding(\.restDurationMaximum), range: 1...480)
+                    rangeRow(strings.settingsWalkDuration, minimum: minutesBinding(\.walkDurationMinimum), maximum: minutesBinding(\.walkDurationMaximum), range: 1...480)
+                    compactStepper(strings.settingsWalkSpeed, value: speedBinding, range: 8...240, step: 4, suffix: "px/s")
                 }
             )
 
             settingsPanel(
                 title: {
-                    sectionTitle("多显示器设置")
+                    sectionTitle(strings.settingsDisplaySection)
                 },
                 content: {
                     displaySelectionRow
@@ -287,7 +306,7 @@ struct SettingsView: View {
 
     private var aboutTab: some View {
         VStack(spacing: 20) {
-            Text("当前版本：\(appVersion)")
+            Text("\(strings.settingsVersionPrefix): \(appVersion)")
                 .font(.system(size: 14, weight: .semibold))
 
             /*
@@ -296,16 +315,16 @@ struct SettingsView: View {
             */
 
             VStack(spacing: 6) {
-                Text("DockCat 是免费下载且开源的软件。作者：Auwuua")
+                Text(strings.settingsAboutDescription)
                 HStack(spacing: 0) {
-                    Text("项目地址：")
+                    Text(strings.settingsProjectPrefix)
                     Link("https://github.com/Auwuua/DockCat", destination: projectURL)
                 }
             }
 
             HStack(spacing: 0) {
-                Text("如果你喜欢 DockCat，欢迎")
-                Link("给我们赞赏", destination: donationURL)
+                Text(strings.settingsDonationLead)
+                Link(strings.settingsDonationLink, destination: donationURL)
             }
         }
         .frame(width: panelWidth)
@@ -315,7 +334,7 @@ struct SettingsView: View {
     }
 
     private var appVersion: String {
-        Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "0.4"
+        Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "0.4.1"
     }
 
     private var projectURL: URL {
@@ -330,23 +349,23 @@ struct SettingsView: View {
         VStack(alignment: .center, spacing: 14) {
             GroupBox {
                 VStack(alignment: .center, spacing: 8) {
-                    Text("DockCat 已陪伴你 \(usageStatistics.litScreenUsageHoursText) 小时")
+                    Text(strings.usageHours(usageStatistics.litScreenUsageHoursText))
                         .lineLimit(1)
                         .minimumScaleFactor(0.8)
-                        .frame(width: labelWidth + controlWidth, alignment: .center)
-                    Text("已完成喝水提醒 \(usageStatistics.completedWaterReminderCount) 次、走动提醒 \(usageStatistics.completedMovementReminderCount) 次")
+                        .frame(width: statisticsContentWidth, alignment: .center)
+                    Text(strings.reminderStats(water: usageStatistics.completedWaterReminderCount, movement: usageStatistics.completedMovementReminderCount))
                         .lineLimit(1)
                         .minimumScaleFactor(0.8)
-                        .frame(width: labelWidth + controlWidth, alignment: .center)
-                    Text("\(draft.catName) 出门遇到事件 \(usageStatistics.outingEventCount) 次、带回礼物 \(usageStatistics.outingCollectableCount) 次")
+                        .frame(width: statisticsContentWidth, alignment: .center)
+                    Text(strings.outingStats(catName: draft.catName, events: usageStatistics.outingEventCount, collectables: usageStatistics.outingCollectableCount))
                         .lineLimit(1)
                         .minimumScaleFactor(0.8)
-                        .frame(width: labelWidth + controlWidth, alignment: .center)
+                        .frame(width: statisticsContentWidth, alignment: .center)
                 }
-                .frame(width: labelWidth + controlWidth, alignment: .center)
+                .frame(width: statisticsContentWidth, alignment: .center)
                 .padding(.vertical, 6)
             } label: {
-                sectionTitle("数据统计")
+                sectionTitle(strings.settingsStatisticsSection)
             }
             .frame(width: panelWidth, alignment: .center)
 
@@ -355,7 +374,7 @@ struct SettingsView: View {
                     .stroke(Color(nsColor: .separatorColor).opacity(0.45), lineWidth: 1)
                     .frame(width: 360, height: 150)
                     .overlay {
-                        Text("还没有收藏品")
+                        Text(strings.settingsNoCollectables)
                             .foregroundStyle(.secondary)
                     }
             } else {
@@ -378,10 +397,10 @@ struct SettingsView: View {
 
     private var displaySelectionRow: some View {
         HStack(spacing: rowSpacing) {
-            Text("猫咪出现在")
+            Text(strings.settingsDisplayRow)
                 .frame(width: labelWidth, alignment: .trailing)
             Picker("", selection: $draft.activityDisplayID) {
-                ForEach(displayOptions) { option in
+                ForEach(DockGeometry.currentDisplaySelectionOptions(language: draft.language)) { option in
                     Text(option.title)
                         .tag(option.displayID)
                 }
@@ -405,7 +424,7 @@ struct SettingsView: View {
         }
         .sorted {
             if $0.collectable.rarity == $1.collectable.rarity {
-                return $0.collectable.chineseName < $1.collectable.chineseName
+                return strings.collectableName($0.collectable) < strings.collectableName($1.collectable)
             }
             return $0.collectable.rarity > $1.collectable.rarity
         }
@@ -441,7 +460,7 @@ struct SettingsView: View {
             }
             .frame(width: 88, height: 78)
 
-            Text(item.collectable.chineseName)
+            Text(strings.collectableName(item.collectable))
                 .font(.system(size: 12))
                 .lineLimit(1)
                 .minimumScaleFactor(0.75)
@@ -491,41 +510,54 @@ struct SettingsView: View {
     private func showAssetPackValidationAlert(_ report: AssetPackValidationReport) {
         let alert = NSAlert()
         alert.alertStyle = report.isLoadable ? .informational : .warning
-        alert.messageText = report.isLoadable ? "加载校验结果" : "资源包加载失败"
+        alert.messageText = report.isLoadable ? strings.assetPackValidationSuccessTitle : strings.assetPackValidationFailureTitle
         alert.informativeText = assetPackValidationText(report)
-        alert.addButton(withTitle: "好")
+        alert.addButton(withTitle: strings.assetPackAlertOK)
         alert.runModal()
     }
 
     private func assetPackValidationText(_ report: AssetPackValidationReport) -> String {
         guard let pack = report.pack else {
-            return "资源包 ID：\(report.requestedID)\n\(report.errorDescription ?? "未知错误。")"
+            return "\(strings.settingsAssetPackID): \(report.requestedID)\n\(strings.assetPackError(report.errorDescription))"
         }
 
         var lines = [
-            "资源包 ID：\(pack.id)",
-            "猫咪名字：\(pack.manifest.name)",
-            "作者：\(pack.manifest.author)",
+            "\(strings.settingsAssetPackID): \(pack.id)",
+            "\(strings.settingsCatName): \(pack.manifest.name)",
+            "\(authorLabel): \(pack.manifest.author)",
             ""
         ]
 
         for status in report.poseStatuses {
+            let title = strings.assetPackStatusTitle(status.title)
             if status.isAvailable {
-                lines.append("\(status.title)：\(status.count) 张可用")
+                lines.append(languageLine(title: title, chinese: "\(status.count) 张可用", english: "\(status.count) available"))
             } else {
-                lines.append("\(status.title)：缺失，将使用默认小猫")
+                lines.append(languageLine(title: title, chinese: "缺失，将使用默认小猫", english: "Missing; default cat will be used"))
             }
         }
 
         if report.walkFrameCount > 0 {
-            lines.append("散步动画：\(report.walkFrameCount) 帧可用，\(formatFPS(pack.manifest.animations.walk.fps)) fps")
+            lines.append(languageLine(title: walkAnimationLabel, chinese: "\(report.walkFrameCount) 帧可用，\(formatFPS(pack.manifest.animations.walk.fps)) fps", english: "\(report.walkFrameCount) frames available, \(formatFPS(pack.manifest.animations.walk.fps)) fps"))
         } else {
-            lines.append("散步动画：缺失，将使用默认小猫")
+            lines.append(languageLine(title: walkAnimationLabel, chinese: "缺失，将使用默认小猫", english: "Missing; default cat will be used"))
         }
 
         let iconsAvailable = report.hasValidSleepIcon && report.hasValidEmptyIcon
-        lines.append("App 图标：\(iconsAvailable ? "自定义图标可用" : "缺失，将使用默认小猫")")
+        lines.append(languageLine(title: "App icon", chinese: iconsAvailable ? "自定义图标可用" : "缺失，将使用默认小猫", english: iconsAvailable ? "Custom icons available" : "Missing; default cat will be used"))
         return lines.joined(separator: "\n")
+    }
+
+    private var authorLabel: String {
+        draft.language == .chinese ? "作者" : "Author"
+    }
+
+    private var walkAnimationLabel: String {
+        draft.language == .chinese ? "散步动画" : "Walking animation"
+    }
+
+    private func languageLine(title: String, chinese: String, english: String) -> String {
+        draft.language == .chinese ? "\(title)：\(chinese)" : "\(title): \(english)"
     }
 
     private func formatFPS(_ fps: Double) -> String {
@@ -570,7 +602,7 @@ struct SettingsView: View {
                 numericStepper(value: minimum, range: range, step: 1)
                 Text("–")
                 numericStepper(value: maximum, range: range, step: 1)
-                Text("分钟")
+                Text(strings.minuteUnit)
             }
             .frame(width: controlWidth, alignment: .leading)
         }

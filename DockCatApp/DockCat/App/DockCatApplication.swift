@@ -43,6 +43,10 @@ final class DockCatApplication: NSObject, NSApplicationDelegate {
     private var pendingOutingReturnReward: OutingReward?
     private var shouldUseStartPositionForNextTransition = false
 
+    private var strings: AppStrings {
+        AppStrings(language: settings.language)
+    }
+
     func applicationDidFinishLaunching(_ notification: Notification) {
         RuntimeDiagnostics.record("applicationDidFinishLaunching")
         settings = settingsStore.load()
@@ -146,7 +150,7 @@ final class DockCatApplication: NSObject, NSApplicationDelegate {
         interactionController = CatInteractionController(catView: catWindow.catView)
         interactionController.onContextMenu = { [weak self] event in
             guard let self else { return }
-            self.catMenuController.show(snapshot: self.statusSnapshot(), at: event, in: self.catWindow.catView)
+            self.catMenuController.show(snapshot: self.statusSnapshot(), language: self.settings.language, at: event, in: self.catWindow.catView)
         }
         interactionController.onBeginDrag = { [weak self] in
             self?.stateMachine.beginDrag()
@@ -209,8 +213,12 @@ final class DockCatApplication: NSObject, NSApplicationDelegate {
             let previousAssetPackID = self.settings.selectedAssetPackID
             let previousStartPositionPercent = self.settings.startPositionPercent
             let previousActivityDisplayID = self.settings.activityDisplayID
+            let previousLanguage = self.settings.language
             self.settings = updated
             self.reminderScheduler.updateSettings(updated)
+            if updated.language != previousLanguage {
+                self.configureApplicationMenu()
+            }
             if updated.selectedAssetPackID != previousAssetPackID {
                 self.reloadSelectedAssetPack()
                 self.applyState(self.stateMachine.state)
@@ -273,11 +281,11 @@ final class DockCatApplication: NSObject, NSApplicationDelegate {
         let mainMenu = NSMenu()
         let appMenuItem = NSMenuItem()
         let appMenu = NSMenu(title: "DockCat")
-        appMenu.addItem(menuItem("摸摸 (改变姿势)", #selector(petFromMenu)))
-        appMenu.addItem(menuItem("出门玩吧 (专注模式)", #selector(startOutingFromMenu)))
-        appMenu.addItem(menuItem("设置", #selector(openSettingsFromMenu), keyEquivalent: ","))
+        appMenu.addItem(menuItem(strings.menuPet, #selector(petFromMenu)))
+        appMenu.addItem(menuItem(strings.menuGoOut, #selector(startOutingFromMenu)))
+        appMenu.addItem(menuItem(strings.menuSettings, #selector(openSettingsFromMenu), keyEquivalent: ","))
         appMenu.addItem(NSMenuItem.separator())
-        appMenu.addItem(menuItem("去睡觉吧 (退出应用)", #selector(quitFromMenu), keyEquivalent: "q"))
+        appMenu.addItem(menuItem(strings.menuSleep, #selector(quitFromMenu), keyEquivalent: "q"))
         appMenuItem.submenu = appMenu
         mainMenu.addItem(appMenuItem)
         NSApplication.shared.mainMenu = mainMenu
@@ -410,9 +418,9 @@ final class DockCatApplication: NSObject, NSApplicationDelegate {
 
     private func showReminder(_ type: ReminderType) {
         catWindow.showBubble(
-            message: type.message(salutation: settings.userSalutation),
-            primaryTitle: "完成啦",
-            secondaryTitle: "稍等5分钟",
+            message: type.message(salutation: settings.userSalutation, language: settings.language),
+            primaryTitle: strings.done,
+            secondaryTitle: strings.snoozeFiveMinutes,
             onPrimary: { [weak self] in
                 guard let self else { return }
                 self.reminderScheduler.complete(type)
@@ -454,10 +462,11 @@ final class DockCatApplication: NSObject, NSApplicationDelegate {
 
     private func askOutingDuration() {
         catWindow.showInputBubble(
-            message: "要让\(settings.catName)出门多久呢？",
+            message: strings.askOutingDuration(catName: settings.catName),
             value: "\(Int(settings.defaultOutingDuration / 60))",
-            primaryTitle: "出门",
-            secondaryTitle: "取消",
+            primaryTitle: strings.outingPrimary,
+            secondaryTitle: strings.cancel,
+            minuteUnit: strings.minuteUnit,
             onPrimary: { [weak self] value in
                 self?.confirmOuting(minutesText: value)
             },
@@ -477,8 +486,8 @@ final class DockCatApplication: NSObject, NSApplicationDelegate {
 
     private func showOutingDepartureResponse() {
         catWindow.showBubble(
-            message: "我出门啦，\(settings.userSalutation)工作要加油呀！",
-            primaryTitle: "好的",
+            message: strings.outingDeparture(salutation: settings.userSalutation),
+            primaryTitle: strings.ok,
             onPrimary: { [weak self] in
                 self?.startConfirmedOuting()
             }
@@ -561,25 +570,25 @@ final class DockCatApplication: NSObject, NSApplicationDelegate {
         switch pendingOutingReturnReward {
         case .event(let event):
             catWindow.showBubble(
-                message: "\(settings.userSalutation)，我回来啦。\(event.chineseDescription)",
-                primaryTitle: "欢迎回来",
+                message: strings.outingReturnEvent(salutation: settings.userSalutation, event: event),
+                primaryTitle: strings.welcomeBack,
                 onPrimary: { [weak self] in
                     self?.finishOutingReturn()
                 }
             )
         case .collectable(let collectable):
             catWindow.showImageBubble(
-                message: "我回来啦，给\(settings.userSalutation)带了礼物",
+                message: strings.outingReturnCollectable(salutation: settings.userSalutation),
                 image: collectableImage(collectable),
-                primaryTitle: "收下礼物",
+                primaryTitle: strings.receiveGift,
                 onPrimary: { [weak self] in
                     self?.finishOutingReturn()
                 }
             )
         case nil:
             catWindow.showBubble(
-                message: "\(settings.userSalutation)，我回来啦",
-                primaryTitle: "欢迎回来",
+                message: strings.outingReturnPlain(salutation: settings.userSalutation),
+                primaryTitle: strings.welcomeBack,
                 onPrimary: { [weak self] in
                     self?.finishOutingReturn()
                 }
@@ -842,9 +851,9 @@ final class DockCatApplication: NSObject, NSApplicationDelegate {
         catWindow.setImage(pose.image, mirrored: pose.mirrored)
         catWindow.show(at: outingReturnTarget())
         catWindow.showBubble(
-            message: "提前召回会丢失可能的收藏品，确定要召回\(settings.catName)吗？",
-            primaryTitle: "确认",
-            secondaryTitle: "取消",
+            message: strings.recallConfirmation(catName: settings.catName),
+            primaryTitle: strings.confirm,
+            secondaryTitle: strings.cancel,
             onPrimary: { [weak self] in
                 guard let self else { return }
                 self.catWindow.hideBubble()

@@ -129,13 +129,14 @@ final class CatWindowController {
         value: String,
         primaryTitle: String,
         secondaryTitle: String,
+        minuteUnit: String = "分钟",
         onPrimary: @escaping (String) -> Void,
         onSecondary: @escaping () -> Void
     ) {
         bubbleSize = inputBubbleSize(message: message, width: 260, minimumHeight: 112)
         bubbleView.isHidden = false
         updateLayoutPreservingAnchor(catSize: catView.frame.size)
-        bubbleView.configureInput(message: message, value: value, primaryTitle: primaryTitle, secondaryTitle: secondaryTitle)
+        bubbleView.configureInput(message: message, value: value, primaryTitle: primaryTitle, secondaryTitle: secondaryTitle, minuteUnit: minuteUnit)
         bubbleView.onPrimary = { value in onPrimary(value ?? "") }
         bubbleView.onSecondary = onSecondary
     }

@@ -1,6 +1,7 @@
 import Foundation
 
 struct AppSettings: Codable, Equatable {
+    var language: AppLanguage
     var catName: String
     var catIdentifier: String
     var userSalutation: String
@@ -21,6 +22,7 @@ struct AppSettings: Codable, Equatable {
     var activeOutingDuration: TimeInterval?
 
     enum CodingKeys: String, CodingKey {
+        case language
         case catName
         case catIdentifier
         case userSalutation
@@ -46,6 +48,7 @@ struct AppSettings: Codable, Equatable {
     }
 
     static let defaults = AppSettings(
+        language: .chinese,
         catName: "栗子",
         catIdentifier: "Lizz",
         userSalutation: "妈妈",
@@ -66,7 +69,37 @@ struct AppSettings: Codable, Equatable {
         activeOutingDuration: nil
     )
 
+    static func defaults(for language: AppLanguage) -> AppSettings {
+        switch language {
+        case .chinese:
+            return .defaults
+        case .english:
+            return AppSettings(
+                language: .english,
+                catName: "Lizz",
+                catIdentifier: "Lizz",
+                userSalutation: "Mom",
+                selectedAssetPackID: "default-lizz",
+                remindersEnabled: true,
+                waterReminderInterval: 30 * 60,
+                movementReminderInterval: 60 * 60,
+                defaultOutingDuration: 25 * 60,
+                restDurationMinimum: 2 * 60,
+                restDurationMaximum: 5 * 60,
+                walkDurationMinimum: 2 * 60,
+                walkDurationMaximum: 5 * 60,
+                walkBaseSpeed: 36,
+                catScalePercent: 10,
+                startPositionPercent: 75,
+                activityDisplayID: nil,
+                activeOutingEndDate: nil,
+                activeOutingDuration: nil
+            )
+        }
+    }
+
     init(
+        language: AppLanguage,
         catName: String,
         catIdentifier: String,
         userSalutation: String,
@@ -86,6 +119,7 @@ struct AppSettings: Codable, Equatable {
         activeOutingEndDate: Date?,
         activeOutingDuration: TimeInterval?
     ) {
+        self.language = language
         self.catName = catName
         self.catIdentifier = catIdentifier
         self.userSalutation = userSalutation
@@ -109,6 +143,7 @@ struct AppSettings: Codable, Equatable {
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         let defaults = AppSettings.defaults
+        language = try container.decodeIfPresent(AppLanguage.self, forKey: .language) ?? defaults.language
         catName = try container.decodeIfPresent(String.self, forKey: .catName) ?? defaults.catName
         catIdentifier = try container.decodeIfPresent(String.self, forKey: .catIdentifier) ?? defaults.catIdentifier
         userSalutation = try container.decodeIfPresent(String.self, forKey: .userSalutation) ?? defaults.userSalutation
@@ -134,6 +169,7 @@ struct AppSettings: Codable, Equatable {
 
     func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(language, forKey: .language)
         try container.encode(catName, forKey: .catName)
         try container.encode(catIdentifier, forKey: .catIdentifier)
         try container.encode(userSalutation, forKey: .userSalutation)

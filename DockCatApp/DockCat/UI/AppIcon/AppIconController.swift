@@ -33,6 +33,7 @@ final class AppIconController {
     @discardableResult
     func applyPersistentFileIconIfNeeded() -> Bool {
         guard
+            shouldApplyPersistentFileIcon,
             iconSource?.usesCustomIcons == true,
             let sleepURL = iconSource?.sleepURL,
             let image = NSImage(contentsOf: sleepURL)
@@ -45,6 +46,12 @@ final class AppIconController {
             DockCatLog.app.error("Failed to apply persistent custom app icon to \(self.bundle.bundlePath)")
         }
         return didApply
+    }
+
+    private var shouldApplyPersistentFileIcon: Bool {
+        let path = bundle.bundleURL.standardizedFileURL.path
+        return !path.contains("/DerivedData/")
+            && !path.contains("/Build/Products/")
     }
 
     private func setIcon(url: URL?, fallbackName name: String) {

@@ -14,19 +14,20 @@ final class DockMenuController: NSObject {
     func applicationDockMenu(_ sender: NSApplication) -> NSMenu? {
         let menu = NSMenu()
         let state = stateProvider?()
+        let currentSettings = settingsProvider?() ?? .defaults
+        let strings = AppStrings(language: currentSettings.language)
         if let snapshot = statusProvider?() {
-            menu.addItem(CatStatusMenuPresenter.statusItem(snapshot: snapshot))
+            menu.addItem(CatStatusMenuPresenter.statusItem(snapshot: snapshot, language: currentSettings.language))
             menu.addItem(NSMenuItem.separator())
         }
         if case .outing(.away) = state {
-            let settings = settingsProvider?() ?? .defaults
-            menu.addItem(item("召回\(settings.catName)", #selector(recall)))
+            menu.addItem(item(strings.recall(currentSettings.catName), #selector(recall)))
         } else {
-            menu.addItem(item("摸摸 (改变姿势)", #selector(pet)))
-            menu.addItem(item("出门玩吧 (专注模式)", #selector(outing)))
+            menu.addItem(item(strings.menuPet, #selector(pet)))
+            menu.addItem(item(strings.menuGoOut, #selector(outing)))
         }
-        menu.addItem(item("设置", #selector(settings)))
-        menu.addItem(item("去睡觉吧 (退出应用)", #selector(sleep)))
+        menu.addItem(item(strings.menuSettings, #selector(settings)))
+        menu.addItem(item(strings.menuSleep, #selector(sleep)))
         return menu
     }
 

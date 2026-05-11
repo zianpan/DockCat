@@ -25,8 +25,8 @@ enum DockGeometry {
         )
     }
 
-    static func currentDisplaySelectionOptions() -> [DisplaySelectionOption] {
-        displaySelectionOptions(displays: currentDisplayDescriptors())
+    static func currentDisplaySelectionOptions(language: AppLanguage = .chinese) -> [DisplaySelectionOption] {
+        displaySelectionOptions(displays: currentDisplayDescriptors(), language: language)
     }
 
     static func currentActivityScreen(activityDisplayID: UInt32?) -> NSScreen? {
@@ -48,14 +48,15 @@ enum DockGeometry {
         )
     }
 
-    static func displaySelectionOptions(displays: [DisplayDescriptor]) -> [DisplaySelectionOption] {
+    static func displaySelectionOptions(displays: [DisplayDescriptor], language: AppLanguage = .chinese) -> [DisplaySelectionOption] {
         let displayOptions = displays.map { display in
             DisplaySelectionOption(
                 displayID: display.displayID,
                 title: displayTitle(for: display)
             )
         }
-        return [DisplaySelectionOption(displayID: nil, title: "主显示器")] + displayOptions
+        let primaryTitle = language == .chinese ? "主显示器" : "Primary display"
+        return [DisplaySelectionOption(displayID: nil, title: primaryTitle)] + displayOptions
     }
 
     static func selectedDisplay(activityDisplayID: UInt32?, displays: [DisplayDescriptor]) -> DisplayDescriptor? {

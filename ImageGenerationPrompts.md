@@ -159,6 +159,8 @@ Create a single small transparent-background PNG collectable item for DockCat: `
 
 Use a visual style compatible with the DockCat cat assets: simplified, rounded, charming, nostalgic early-2000s browser pet-game style, with clean smooth outlines, slightly thick dark linework, warm muted colors, flat or softly blended fills, minimal gentle shading, and low visual complexity. The collectable should feel like a tiny object the cat could bring home from a walk. It should be readable at small size and visually compatible with the cat.
 
+If you add a display name for a new collectable, keep the English name at 16 characters or fewer, including spaces.
+
 File requirements:
 
 - File format: PNG with alpha transparency.
@@ -186,4 +188,3 @@ Example output file: `collectables/pebble.png`
 Create a feather collectable, light and gently curved, with a soft cream, pale gray, or muted tan color. The silhouette should be rounded and friendly rather than sharp, with a simple central shaft and only a few broad feather barbs so it remains readable at small size. It should feel like an ordinary outdoor bit the cat proudly carried home.
 
 Example output file: `collectables/feather.png`
-

@@ -6,16 +6,16 @@ DockCat custom cats are local asset packs. Each pack is one folder with a `manif
 
 ## Quick Start
 
-1. Open DockCat Settings > Pet.
-2. Click `打开资源包位置`. DockCat opens:
+1. Open DockCat Settings > Cat.
+2. Click `Open folder`. DockCat opens:
 
 ```text
 ~/Library/Application Support/DockCat/CatPacks/
 ```
 
-3. Open the pre-created `my-cat/` template folder.
+3. Open the `my-cat/` template folder.
 4. Add at least one image you want to use to the corresponding pose folder, such as `poses/dialogue/stand.png`.
-5. Return to Settings > Pet, select or enter `my-cat`, click `加载所选`, then save.
+5. Return to Settings > Cat, select or enter `my-cat`, click `Load pack`, then save.
 
 The resource pack ID is the folder name under `CatPacks/`.
 
@@ -50,15 +50,17 @@ my-cat/
 
 `app_icons/` is optional. Everything else is recommended for a complete pack.
 
+You can check out the `default-lizz` pack for reference.
+
 ## Pose Requirements
 
-DockCat scans each pose folder and loads every loadable image file in that folder. You can use whatever filename for the images, but clear names make your pack more readable.
+DockCat scans each pose folder and loads every readable image file in that folder. You can use whatever filename for the images, but clear names make your pack more readable.
 
 When the cat switch to a pose, DockCat randomly presents one image from the corresponding folder. You can add any number of images you would like your cat to have for each pose.
 
 - `poses/resting/`: one or more resting poses. 
 - `poses/held/`: one or more poses used while the cat is being dragged.
-- `poses/dialogue/`: one or more front-facing poses used for reminders, outing messages, and Settings > Pet preview.
+- `poses/dialogue/`: one or more front-facing poses used for reminders, outing messages, and Settings > Cat preview.
 - `poses/transition/`: one or more short transition poses, such as stretching or yawning.
 - `animations/walk/`: walking animation frames. Filenames decide playback order.
 
@@ -109,7 +111,7 @@ Complete example:
 
 Field notes:
 
-- `id`: compatibility and description field. DockCat selects packs by folder name, so this does not need to match the resource pack ID entered in Settings > Pet. However, if you would like to share your pack with the community, we recommend changing it to a unique id.
+- `id`: compatibility and description field. DockCat selects packs by folder name, so this does not need to match the resource pack ID entered in Settings > Cat. However, if you would like to share your pack with the community, we recommend changing it to a unique id.
 - `name`: Name of the cat.
 - `author`: creator name.
 - `canvas_width` and `canvas_height`: stable canvas size for walking animation rendering. Change these values when your walk frames use a different intended canvas size. Static pose images do not use these manifest values for display size; they are shown from their actual PNG dimensions.
@@ -148,13 +150,13 @@ Icon files are not hot-reloaded. Restart DockCat after adding, replacing, or edi
 
 After adding or changing a custom pack:
 
-1. Open Settings > Pet.
-2. Click `打开资源包位置` if you need Finder access.
+1. Open Settings > Cat.
+2. Click `Open folder` if you need Finder access.
 3. Select or enter the folder ID, such as `my-cat`.
-4. Click `加载所选` to rescan and validate the pack.
+4. Click `Load pack` to rescan and validate the pack.
 5. Save.
 
-When changing only Settings values, saving is enough. When changing image files inside a pack, click `加载所选` so the asset scanner sees the new files. If you change `manifest.json`, restart DockCat so the app reloads the manifest values. Icon file updates also require restarting DockCat.
+When changing only Settings values, saving is enough. When changing image files inside a pack, click `Load pack` so the asset scanner sees the new files. If you change `manifest.json`, restart DockCat so the app reloads the manifest values. Icon file updates also require restarting DockCat.
 
 ## Troubleshooting
 
@@ -162,9 +164,9 @@ If the pack does not appear:
 
 - Check that the folder is directly under `~/Library/Application Support/DockCat/CatPacks/`.
 - Check that `manifest.json` is valid JSON.
-- Check that the folder name matches the ID entered in Settings > Pet.
+- Check that the folder name matches the ID entered in Settings > Cat.
 - Check that image files are readable PNGs.
-- Click `加载所选` after changing files.
+- Click `Load pack` after changing files.
 
 If only some states show your cat:
 
@@ -186,4 +188,3 @@ If the walking cat is much smaller or larger than other states:
 - Open `manifest.json` and adjust `canvas_width` and `canvas_height` to match the intended walking animation canvas.
 - For example, if your walk frames are designed around a `1500 x 1500 px` canvas, set both values to `1500`.
 - Restart DockCat after changing `manifest.json`.
-

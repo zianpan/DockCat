@@ -63,6 +63,7 @@ final class SettingsWindowController: NSObject, NSWindowDelegate {
 
     func show() {
         if let window {
+            window.title = AppStrings(language: settings.language).settingsWindowTitle
             if let hosting = window.contentViewController as? NSHostingController<SettingsView> {
                 hosting.rootView = makeSettingsView()
             }
@@ -73,7 +74,7 @@ final class SettingsWindowController: NSObject, NSWindowDelegate {
         let view = makeSettingsView()
         let hosting = NSHostingController(rootView: view)
         let window = NSWindow(contentViewController: hosting)
-        window.title = "DockCat 设置"
+        window.title = AppStrings(language: settings.language).settingsWindowTitle
         window.setContentSize(NSSize(width: 520, height: 580))
         window.styleMask = [.titled, .closable, .miniaturizable]
         window.isReleasedWhenClosed = false

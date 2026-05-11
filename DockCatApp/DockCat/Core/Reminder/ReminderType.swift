@@ -4,13 +4,8 @@ enum ReminderType: String, Codable, Equatable {
     case water
     case movement
 
-    func message(salutation: String) -> String {
-        switch self {
-        case .water:
-            return "\(salutation)，该喝水啦"
-        case .movement:
-            return "\(salutation)，该起来走走啦"
-        }
+    func message(salutation: String, language: AppLanguage = .chinese) -> String {
+        AppStrings(language: language).reminderMessage(self, salutation: salutation)
     }
 
     init(from decoder: Decoder) throws {

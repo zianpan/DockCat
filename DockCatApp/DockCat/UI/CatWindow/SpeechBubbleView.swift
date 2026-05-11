@@ -156,8 +156,9 @@ final class SpeechBubbleView: NSView {
         secondaryTopToImage.isActive = image != nil
     }
 
-    func configureInput(message: String, value: String, primaryTitle: String, secondaryTitle: String) {
+    func configureInput(message: String, value: String, primaryTitle: String, secondaryTitle: String, minuteUnit: String = "分钟") {
         label.stringValue = message
+        minuteLabel.stringValue = minuteUnit
         let rawMinutes = Double(Int(value) ?? Int(stepper.minValue))
         let minutes = (rawMinutes / stepper.increment).rounded() * stepper.increment
         stepper.doubleValue = min(max(minutes, stepper.minValue), stepper.maxValue)
