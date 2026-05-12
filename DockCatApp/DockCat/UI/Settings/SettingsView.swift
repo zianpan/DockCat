@@ -235,20 +235,21 @@ struct SettingsView: View {
         VStack(alignment: .center, spacing: 14) {
             settingsPanel(
                 title: {
-                    HStack(spacing: 12) {
+                    HStack(spacing: 18) {
                         sectionTitle(strings.settingsReminderSection)
-                        Toggle("", isOn: $draft.remindersEnabled)
-                            .toggleStyle(.checkbox)
-                            .labelsHidden()
-                        Text(strings.settingsReminderEnabled)
-                            .font(.system(size: 14))
+                        HStack(spacing: 4) {
+                            Toggle("", isOn: $draft.remindersEnabled)
+                                .toggleStyle(.checkbox)
+                                .labelsHidden()
+                            Text(strings.settingsReminderEnabled)
+                                .font(.system(size: 14))
+                        }
                         Spacer()
                     }
                 },
                 content: {
                     compactStepper(strings.settingsWaterReminder, value: minutesBinding(\.waterReminderInterval), range: 1...240, step: 5, suffix: strings.minuteUnit)
                     compactStepper(strings.settingsMovementReminder, value: minutesBinding(\.movementReminderInterval), range: 5...360, step: 5, suffix: strings.minuteUnit)
-                    compactStepper(strings.settingsDefaultOutingDuration, value: minutesBinding(\.defaultOutingDuration), range: 5...480, step: 5, suffix: strings.minuteUnit)
                 }
             )
 
@@ -260,6 +261,7 @@ struct SettingsView: View {
                     rangeRow(strings.settingsRestDuration, minimum: minutesBinding(\.restDurationMinimum), maximum: minutesBinding(\.restDurationMaximum), range: 1...480)
                     rangeRow(strings.settingsWalkDuration, minimum: minutesBinding(\.walkDurationMinimum), maximum: minutesBinding(\.walkDurationMaximum), range: 1...480)
                     compactStepper(strings.settingsWalkSpeed, value: speedBinding, range: 8...240, step: 4, suffix: "px/s")
+                    compactStepper(strings.settingsDefaultOutingDuration, value: minutesBinding(\.defaultOutingDuration), range: 5...480, step: 5, suffix: strings.minuteUnit)
                 }
             )
 
@@ -334,7 +336,7 @@ struct SettingsView: View {
     }
 
     private var appVersion: String {
-        Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "0.4.1"
+        Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "0.4.2"
     }
 
     private var projectURL: URL {
@@ -342,7 +344,7 @@ struct SettingsView: View {
     }
 
     private var donationURL: URL {
-        URL(string: "https://github.com/Auwuua/DockCat/blob/main/Wechat_donate.jpg")!
+        URL(string: "https://github.com/Auwuua/DockCat/blob/main/README_figs/Wechat_donate.jpg")!
     }
 
     private var collectablesTab: some View {

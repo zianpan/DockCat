@@ -17,13 +17,13 @@ DockCat custom cats are local asset packs. Each pack is one folder with a `manif
 4. Add at least one image you want to use to the corresponding pose folder, such as `poses/dialogue/stand.png`.
 5. Return to Settings > Cat, select or enter `my-cat`, click `Load pack`, then save.
 
-The resource pack ID is the folder name under `CatPacks/`.
+The resource pack ID is the folder name under `CatPacks/`. Feel free to change `my-cat/` to your cat's name.
 
 DockCat supports incomplete packs for preview. Missing assets are filled from the default cat.
 
 ## Complete Pack Structure
 
-A complete shareable pack should include at least one image for every asset type, for example:
+A complete pack should include at least one image for every asset type, for example:
 
 ```text
 my-cat/
@@ -50,15 +50,15 @@ my-cat/
 
 `app_icons/` is optional. Everything else is recommended for a complete pack.
 
-You can check out the `default-lizz` pack for reference.
+`CatPacks/default-lizz/` is a copy of the default cat's asset pack for reference. This reference copy is automatically updated when a newer DockCat version contains more pose images for Lizz. We recommend editing or copying `my-cat/` for your own pack, and keeping a separate backup of your cat images for safekeeping.
 
 ## Pose Requirements
 
-DockCat scans each pose folder and loads every readable image file in that folder. You can use whatever filename for the images, but clear names make your pack more readable.
+DockCat scans each pose folder and loads every readable image file in that folder. You can use any filenames for the images, but clear names make your pack more readable.
 
-When the cat switch to a pose, DockCat randomly presents one image from the corresponding folder. You can add any number of images you would like your cat to have for each pose.
+When the cat switches to a pose, DockCat randomly presents one image from the corresponding folder. You can add as many images as you would like your cat to have for each pose.
 
-- `poses/resting/`: one or more resting poses. 
+- `poses/resting/`: one or more resting poses.
 - `poses/held/`: one or more poses used while the cat is being dragged.
 - `poses/dialogue/`: one or more front-facing poses used for reminders, outing messages, and Settings > Cat preview.
 - `poses/transition/`: one or more short transition poses, such as stretching or yawning.
@@ -71,7 +71,7 @@ DockCat mirrors pose and walk images automatically when the cat needs to face th
 We recommend the following for the best experience:
 
 - Use PNG files with transparent backgrounds.
-- Use the same canvas size for every cat pose and walk frame. `512 x 512 px` is recommended.
+- Use the same canvas size for every cat pose and walk frame.
 - Keep the cat at a consistent visual size across all images.
 - Keep the paw-bottom or body-bottom anchor in a consistent position so the cat does not jump when changing states.
 - Leave transparent margin around the cat. At least 8% margin is recommended.
@@ -175,7 +175,7 @@ If only some states show your cat:
 
 If the cat jumps when changing poses:
 
-- Make every PNG use the similar canvas size.
+- Make every PNG use a similar canvas size.
 - Align the cat body and paw-bottom consistently across all pose files.
 - Keep transparent margins consistent.
 

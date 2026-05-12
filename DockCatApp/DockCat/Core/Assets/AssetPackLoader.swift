@@ -30,6 +30,8 @@ struct AssetPackValidationReport {
 }
 
 final class AssetPackLoader {
+    private static let defaultPackID = "default-lizz"
+
     private let fileManager: FileManager
     private let bundle: Bundle
     private let applicationSupportURL: URL?
@@ -42,6 +44,9 @@ final class AssetPackLoader {
 
     func loadSelectedPack(selectedID: String) -> CatAssetPack {
         prepareCustomPacksDirectory()
+        if selectedID == Self.defaultPackID {
+            return loadDefaultPack()
+        }
         if let custom = customPacks(allowIncomplete: true).first(where: { $0.id == selectedID }) {
             return custom
         }
@@ -94,7 +99,7 @@ final class AssetPackLoader {
     }
 
     @discardableResult
-    func prepareCustomPacksDirectory() -> Bool {
+    func prepareCustomPacksDirectory(refreshDefaultPackBackup: Bool = false) -> Bool {
         let root = customPacksRoot()
         var isDir: ObjCBool = false
         if fileManager.fileExists(atPath: root.path, isDirectory: &isDir) {
@@ -111,7 +116,9 @@ final class AssetPackLoader {
             }
         }
 
-        copyDefaultPackIfNeeded(to: root)
+        if refreshDefaultPackBackup {
+            syncDefaultPackBackup(to: root)
+        }
         seedDefaultPackIconsIfNeeded(in: root)
         createTemplatePackIfNeeded(in: root)
         return true
@@ -143,40 +150,15 @@ final class AssetPackLoader {
             )
         }
 
+        if trimmedID == Self.defaultPackID {
+            let pack = loadDefaultPack()
+            return validationReport(requestedID: trimmedID, pack: pack)
+        }
+
         let root = customPacksRoot().appendingPathComponent(trimmedID, isDirectory: true)
         do {
             let pack = try loadPack(at: root, allowIncomplete: true)
-            let statuses = [
-                AssetPackValidationReport.ResourceStatus(
-                    title: "休息状态",
-                    count: loadablePoseURLs(in: pack.restingPosesDirectoryURL).count,
-                    fallbackDescription: "缺失，将使用默认小猫"
-                ),
-                AssetPackValidationReport.ResourceStatus(
-                    title: "抱起状态",
-                    count: loadablePoseURLs(in: pack.heldPosesDirectoryURL).count,
-                    fallbackDescription: "缺失，将使用默认小猫"
-                ),
-                AssetPackValidationReport.ResourceStatus(
-                    title: "对话状态",
-                    count: loadablePoseURLs(in: pack.dialoguePosesDirectoryURL).count,
-                    fallbackDescription: "缺失，将使用默认小猫"
-                ),
-                AssetPackValidationReport.ResourceStatus(
-                    title: "过渡状态",
-                    count: loadablePoseURLs(in: pack.transitionPosesDirectoryURL).count,
-                    fallbackDescription: "缺失，将使用默认小猫"
-                )
-            ]
-            return AssetPackValidationReport(
-                requestedID: trimmedID,
-                pack: pack,
-                errorDescription: nil,
-                poseStatuses: statuses,
-                walkFrameCount: loadableWalkFrameURLs(in: pack).count,
-                hasValidSleepIcon: pack.sleepIconURL.flatMap { NSImage(contentsOf: $0) } != nil,
-                hasValidEmptyIcon: pack.emptyIconURL.flatMap { NSImage(contentsOf: $0) } != nil
-            )
+            return validationReport(requestedID: trimmedID, pack: pack)
         } catch {
             return AssetPackValidationReport(
                 requestedID: trimmedID,
@@ -237,24 +219,58 @@ final class AssetPackLoader {
         ].compactMap { $0 }
     }
 
-    private func copyDefaultPackIfNeeded(to customRoot: URL) {
-        let destination = customRoot.appendingPathComponent("default-lizz", isDirectory: true)
-        guard !fileManager.fileExists(atPath: destination.path) else {
-            return
-        }
+    private func validationReport(requestedID: String, pack: CatAssetPack) -> AssetPackValidationReport {
+        let statuses = [
+            AssetPackValidationReport.ResourceStatus(
+                title: "休息状态",
+                count: loadablePoseURLs(in: pack.restingPosesDirectoryURL).count,
+                fallbackDescription: "缺失，将使用默认小猫"
+            ),
+            AssetPackValidationReport.ResourceStatus(
+                title: "抱起状态",
+                count: loadablePoseURLs(in: pack.heldPosesDirectoryURL).count,
+                fallbackDescription: "缺失，将使用默认小猫"
+            ),
+            AssetPackValidationReport.ResourceStatus(
+                title: "对话状态",
+                count: loadablePoseURLs(in: pack.dialoguePosesDirectoryURL).count,
+                fallbackDescription: "缺失，将使用默认小猫"
+            ),
+            AssetPackValidationReport.ResourceStatus(
+                title: "过渡状态",
+                count: loadablePoseURLs(in: pack.transitionPosesDirectoryURL).count,
+                fallbackDescription: "缺失，将使用默认小猫"
+            )
+        ]
+        return AssetPackValidationReport(
+            requestedID: requestedID,
+            pack: pack,
+            errorDescription: nil,
+            poseStatuses: statuses,
+            walkFrameCount: loadableWalkFrameURLs(in: pack).count,
+            hasValidSleepIcon: pack.sleepIconURL.flatMap { NSImage(contentsOf: $0) } != nil,
+            hasValidEmptyIcon: pack.emptyIconURL.flatMap { NSImage(contentsOf: $0) } != nil
+        )
+    }
+
+    private func syncDefaultPackBackup(to customRoot: URL) {
+        let destination = customRoot.appendingPathComponent(Self.defaultPackID, isDirectory: true)
         guard let source = defaultPackCandidates().first(where: { isDirectory($0) }) else {
             DockCatLog.assets.error("Failed to seed default-lizz because bundled DefaultCat was not found")
             return
         }
         do {
+            if fileManager.fileExists(atPath: destination.path) {
+                try fileManager.removeItem(at: destination)
+            }
             try fileManager.copyItem(at: source, to: destination)
         } catch {
-            DockCatLog.assets.error("Failed to seed default-lizz: \(error.localizedDescription)")
+            DockCatLog.assets.error("Failed to refresh default-lizz backup: \(error.localizedDescription)")
         }
     }
 
     private func seedDefaultPackIconsIfNeeded(in customRoot: URL) {
-        let defaultPackRoot = customRoot.appendingPathComponent("default-lizz", isDirectory: true)
+        let defaultPackRoot = customRoot.appendingPathComponent(Self.defaultPackID, isDirectory: true)
         guard isDirectory(defaultPackRoot) else { return }
         let appIconsRoot = defaultPackRoot.appendingPathComponent("app_icons", isDirectory: true)
         do {

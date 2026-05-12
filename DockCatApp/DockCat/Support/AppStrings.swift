@@ -215,8 +215,8 @@ extension AppStrings {
     var settingsDisplayRow: String { language == .chinese ? "猫咪出现在" : "Cat appears on" }
     var settingsVersionPrefix: String { language == .chinese ? "当前版本" : "Version" }
     var settingsProjectPrefix: String { language == .chinese ? "项目地址：" : "Project: " }
-    var settingsDonationLead: String { language == .chinese ? "如果你喜欢 DockCat，欢迎" : "If you like DockCat, you can " }
-    var settingsDonationLink: String { language == .chinese ? "给我们赞赏" : "support us" }
+    var settingsDonationLead: String { language == .chinese ? "如果你喜欢 DockCat，欢迎" : "If you like DockCat, please consider " }
+    var settingsDonationLink: String { language == .chinese ? "给我们赞赏" : "supporting us" }
     var settingsAboutDescription: String {
         language == .chinese ? "DockCat 是免费下载且开源的软件。作者：Auwuua" : "DockCat is an open-source software. Author: Auwuua"
     }

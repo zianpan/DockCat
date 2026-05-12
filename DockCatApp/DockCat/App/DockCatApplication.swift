@@ -54,6 +54,7 @@ final class DockCatApplication: NSObject, NSApplicationDelegate {
         outingCatalog = outingCatalogLoader.loadCatalog()
         collectableInventory = collectableInventoryStore.load()
         configureUsageSessionTracker()
+        assetLoader.prepareCustomPacksDirectory(refreshDefaultPackBackup: true)
         defaultAssetPack = assetLoader.loadDefaultPack()
         assetPack = assetLoader.loadSelectedPack(selectedID: settings.selectedAssetPackID)
         RuntimeDiagnostics.record("loaded assetPack id=\(assetPack.id) root=\(assetPack.rootURL.path)")

@@ -2,9 +2,9 @@
 
 [中文](README.md) | English
 
-DockCat is a desktop companion cat that lives in the macOS Dock.
+DockCat is a desktop companion cat that lives by the macOS Dock.
 
-It rests, stretches, and wanders along the Dock, and can gently remind you to drink water or stand up for a short walk. DockCat is meant to be a quiet little presence on your screen: soft, lightweight, and never too demanding. You can pet the cat to change its pose, or drag it to a cozy spot you like. When you need to focus, you can send the cat outdoor for a while, and it may come back with a tiny surprise.
+It rests, stretches, and wanders along the Dock, and can gently remind you to drink water or stand up for a short walk. DockCat is meant to be a quiet little presence on your screen: soft, lightweight, and never too demanding. You can pet the cat to change its pose, or drag it to a cozy spot you like. When you need to focus, you can send the cat out for a while, and it may come back with a tiny surprise.
 
 <table>
   <tr>
@@ -38,18 +38,18 @@ If you'd like to let the cat move in, we recommend downloading `DockCat.zip` fro
 - Settings let you change the cat's name, what it calls you, display scale, reminder intervals, and more.
 - Custom cat asset packs are supported, so you can make DockCat look like your own cat.
 
-The cat could switch between these states:
+The cat can switch between these states:
 
 - Resting: the cat holds a pose for a while, such as lying on its side, loafing, or showing its belly.
 - Walking: the cat walks back and forth along the Dock.
 - Transitioning: the cat briefly stretches or yawns.
 - Held: drag the cat with the left mouse button to move it.
 - Dialogue: the cat faces you for reminders and outing conversations.
-- Outing: the cat goes outdoor for the duration you choose, then comes back with something it saw or a small gift.
+- Outing: the cat goes out for the duration you choose, then comes back with something it saw or a small gift.
 
 ## Can I Customize The Cat?
 
-Yes! Supporting custom cats was one of the principles when we design DockCat.
+Yes! Supporting custom cats was one of our original goals when designing DockCat.
 
 To create artwork for your own cat:
 
@@ -98,11 +98,11 @@ DockCat uses the PolyForm Noncommercial License. See [LICENSE.txt](LICENSE.txt) 
 
 - You may freely read, copy, modify, and build your own version of DockCat from this source code.
 - You may not use DockCat or modified versions of it for commercial purposes, including selling it, paid distribution, or bundling it with commercial products.
-- If you publicly distribute a modified version, you shall keep the original license and copyright notice, provide a link to this project, and describe your changes.
+- If you publicly distribute a modified version, you must keep the original license and copyright notice, provide a link to this project, and describe your changes.
 
 ## Support And Contact
 
-DockCat is under active development. We plan to add more built-in cat characters and continue expanding the list of outing results.
+DockCat is under active development. We plan to add more built-in cat characters and continue expanding the outing result list.
 
 If you like DockCat, please consider starring this project at the top right of this page, or using [WeChat donation](README_figs/Wechat_donate.jpg).
 
@@ -110,4 +110,4 @@ If you need help while using DockCat, or want to support DockCat in another way,
 
 - Email: tianmaizhang@gmail.com
 
-We hope DockCat brings you the soft companionship you like.
+We hope DockCat brings you the soft companionship you are looking for.
